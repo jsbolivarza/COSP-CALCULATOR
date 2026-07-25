@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora CPS — Captura FGD</title>
+<title>CPS Calculator — FGD data entry</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#001B6E">
 <meta name="mobile-web-app-capable" content="yes">
@@ -36,6 +36,12 @@
   header .logo span { font-style: italic; opacity: .65; font-size: 1rem; margin-left: 10px; font-weight: 600; text-transform: none; }
   header .badge { background: var(--flower-tint); border: 1px solid #FFB8C8;
     border-radius: 20px; padding: 5px 14px; font-size: .8rem; font-weight: 600; color: #8B0020; }
+  .lang-switch { display: flex; align-items: center; gap: 10px; background: var(--tangerine-tint);
+    border: 1px solid var(--tangerine); border-radius: 24px; padding: 6px 14px 6px 16px; }
+  .lang-switch-label { font-size: .78rem; font-weight: 700; color: var(--night); }
+  .lang-switch .toggle-group { border-color: var(--tangerine); }
+  .lang-switch .toggle-group button { color: var(--tangerine); font-weight: 700; padding: 6px 14px; font-size: .82rem; }
+  .lang-switch .toggle-group button.active { background: var(--tangerine); color: #fff; }
 
   #dashboard { padding: 26px 32px; max-width: 1400px; margin: 0 auto; }
 
@@ -196,73 +202,88 @@
 
 <header>
   <div class="left">
-    <div class="logo">Calculadora CPS <span>Captura en FGD</span></div>
+    <div class="logo" data-i18n="app_title">CPS Calculator <span data-i18n="app_subtitle">FGD data entry</span></div>
   </div>
-  <div class="badge">Herramienta temporal</div>
+  <div class="lang-switch">
+    <span class="lang-switch-label" data-i18n="lang_switch_label">Language:</span>
+    <div class="toggle-group" id="langToggle">
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="es">ES</button>
+      <button type="button" data-lang="pt">PT</button>
+    </div>
+  </div>
+  <div class="badge" data-i18n="badge">Temporary tool \u2014 not connected to SurveyJS</div>
 </header>
 
 <div id="dashboard">
 
-  <div class="notice">
-    <strong>C&oacute;mo usar esta herramienta:</strong> primero, en la Pesta&ntilde;a 1, marquen qu&eacute; actividades hacen en la finca y qu&eacute; tipo de caf&eacute; venden. Luego pasen a la Pesta&ntilde;a 2, donde solo aparecer&aacute;n las preguntas de costos que les corresponden seg&uacute;n lo que marcaron. Todo lo que escriban queda guardado autom&aacute;ticamente en este computador. Para el pago a trabajadores contratados, pueden anotar los d&iacute;as trabajados o el monto de un contrato, lo que sea m&aacute;s f&aacute;cil. Para herramientas o equipos que duran varios a&ntilde;os (como una bomba de fumigar), anoten cu&aacute;nto costaron y cu&aacute;ntos a&ntilde;os duran; la herramienta calcula sola cu&aacute;nto corresponde por a&ntilde;o. Al final pueden guardar una copia del archivo o descargar un resumen con los totales.
+  <div class="notice" data-i18n="notice">
   </div>
 
   <div class="setup-card">
     <div class="field">
-      <label>Nombre / c&oacute;digo del FGD</label>
-      <input type="text" id="fgdName" placeholder="Ej. FGD_Peru_Cusco_01">
+      <label data-i18n="field_fgd_name">FGD name or code</label>
+      <input type="text" id="fgdName" placeholder="e.g. FGD_Peru_Cusco_01">
     </div>
     <div class="field">
-      <label>Unidad de &aacute;rea</label>
+      <label data-i18n="field_flo_id">FLO-ID</label>
+      <input type="text" id="floId" placeholder="FLO-ID" style="min-width:120px">
+    </div>
+    <div class="field">
+      <label data-i18n="field_coop_name">Cooperative name</label>
+      <input type="text" id="coopName" placeholder="" style="min-width:180px">
+    </div>
+    <div class="field">
+      <label data-i18n="field_area_unit">Area unit</label>
       <select id="areaUnit">
-        <option value="ha">Hect&aacute;rea (ha)</option>
-        <option value="mz">Manzana</option>
-        <option value="acre">Acre</option>
-        <option value="otro">Otra</option>
+        <option value="ha" data-i18n="area_unit_ha">Hectare (ha)</option>
+        <option value="mz" data-i18n="area_unit_mz">Manzana</option>
+        <option value="acre" data-i18n="area_unit_acre">Acre</option>
+        <option value="otro" data-i18n="area_unit_other">Other</option>
       </select>
     </div>
     <div class="field">
-      <label>Moneda local (MC)</label>
-      <input type="text" id="currency" placeholder="Ej. PEN, COP, GTQ" style="min-width:110px">
+      <label data-i18n="field_currency">Local currency</label>
+      <input type="text" id="currency" placeholder="e.g. PEN, COP, GTQ" style="min-width:110px">
     </div>
     <div class="field wage">
-      <label>Jornal diario (MC/d&iacute;a)</label>
+      <label data-i18n="field_daily_wage">Daily wage (currency/day)</label>
       <input type="number" step="any" min="0" id="dailyWage" placeholder="0.00">
     </div>
-    <div class="save-status" id="saveStatus">Guardado autom&aacute;tico activo</div>
+    <div class="save-status" id="saveStatus" data-i18n="save_status_auto">Autosaved</div>
   </div>
 
   <div class="tab-bar">
-    <button type="button" class="tab-btn" id="tabBtnActivities" data-tab="activities"><span class="step-num">1</span>Actividades de la finca</button>
-    <button type="button" class="tab-btn" id="tabBtnQuestionnaire" data-tab="questionnaire"><span class="step-num">2</span>Cuestionario de costos</button>
+    <button type="button" class="tab-btn" id="tabBtnActivities" data-tab="activities"><span class="step-num">1</span><span data-i18n="tab1_label">Farm activities</span></button>
+    <button type="button" class="tab-btn" id="tabBtnQuestionnaire" data-tab="questionnaire"><span class="step-num">2</span><span data-i18n="tab2_label">Cost questionnaire</span></button>
   </div>
 
   <div class="tab-panel" id="tabPanelActivities">
     <div class="activity-group-card">
-      <h3>Presentaci&oacute;n del caf&eacute; y rendimiento</h3>
-      <div class="group-desc">Se usa para convertir el Costo de Producci&oacute;n Sostenible en un precio por kg. El ratio de conversi&oacute;n a GBE (cu&aacute;ntos kg de esta presentaci&oacute;n equivalen a 1 kg GBE) se autocompleta seg&uacute;n la presentaci&oacute;n elegida, pero puede ajustarlo si su contexto lo requiere.</div>
+      <h3 data-i18n="presentation_card_title">Coffee type and yield</h3>
+      <div class="group-desc" data-i18n="presentation_card_desc"></div>
       <div class="setup-card" style="box-shadow:none; border:none; padding:0; margin-bottom:0;">
         <div class="field">
-          <label>Presentaci&oacute;n del caf&eacute;</label>
+          <label data-i18n="field_presentation">Coffee type sold</label>
           <select id="presentationSelect"></select>
         </div>
         <div class="field">
-          <label>Kg de esta presentaci&oacute;n = 1 kg GBE</label>
-          <input type="number" step="any" min="0" id="gbeRatioInput" placeholder="ej. 5.00">
+          <label data-i18n="field_gbe_ratio">Kg of this type = 1 kg GBE</label>
+          <input type="number" step="any" min="0" id="gbeRatioInput" placeholder="e.g. 5.00">
         </div>
         <div class="field">
-          <label>Rendimiento real (kg/ha en esa presentaci&oacute;n)</label>
+          <label data-i18n="field_yield">Real yield (kg/ha, in that type)</label>
           <input type="number" step="any" min="0" id="yieldPerHaInput" placeholder="0.00">
         </div>
         <div class="field">
-          <label>Rendimiento equivalente</label>
+          <label data-i18n="field_yield_equiv">Equivalent yield</label>
           <input type="text" id="yieldGbeDisplay" disabled style="background:var(--card-alt); font-weight:600; color:var(--eggplant);">
         </div>
       </div>
     </div>
     <div id="activityGroupsContainer"></div>
     <div class="continue-row">
-      <button type="button" class="btn btn-primary" id="continueToQuestionnaire">Continuar al cuestionario &rarr;</button>
+      <button type="button" class="btn btn-primary" id="continueToQuestionnaire" data-i18n="continue_btn">Continue to questionnaire \u2192</button>
     </div>
   </div>
 
@@ -270,57 +291,65 @@
 
     <div class="kpi-grid">
       <div class="kpi-card night">
-        <div class="kpi-label">CPS Total</div>
-        <div class="kpi-value" id="totalCosp">0.00 <small>MC/unidad</small></div>
+        <div class="kpi-label" data-i18n="kpi_total">CPS Total</div>
+        <div class="kpi-value" id="totalCosp">0.00 <small data-i18n="kpi_total_unit">currency/unit</small></div>
       </div>
       <div class="kpi-card tangerine">
-        <div class="kpi-label">Insumos</div>
+        <div class="kpi-label" data-i18n="kpi_inputs">Inputs</div>
         <div class="kpi-value" id="totalInputs">0.00</div>
       </div>
       <div class="kpi-card grey">
-        <div class="kpi-label">D&iacute;as MO familiar</div>
-        <div class="kpi-value" id="totalHouseholdDays">0.0 <small>d&iacute;as</small></div>
+        <div class="kpi-label" data-i18n="kpi_household_days">Family labour days</div>
+        <div class="kpi-value" id="totalHouseholdDays">0.0 <small data-i18n="ph_days">days</small></div>
       </div>
       <div class="kpi-card eggplant">
-        <div class="kpi-label">MO contratada (costo)</div>
+        <div class="kpi-label" data-i18n="kpi_hired_cost">Paid labour (cost)</div>
         <div class="kpi-value" id="totalHired">0.00</div>
       </div>
       <div class="kpi-card eggplant">
-        <div class="kpi-label">D&iacute;as MO contratada</div>
-        <div class="kpi-value" id="totalHiredDays">0.0 <small>d&iacute;as</small></div>
+        <div class="kpi-label" data-i18n="kpi_hired_days">Paid labour days</div>
+        <div class="kpi-value" id="totalHiredDays">0.0 <small data-i18n="ph_days">days</small></div>
       </div>
       <div class="kpi-card sky">
-        <div class="kpi-label">Costos variables</div>
+        <div class="kpi-label" data-i18n="kpi_variable">Variable costs</div>
         <div class="kpi-value" id="totalVariable">0.00</div>
       </div>
       <div class="kpi-card mint">
-        <div class="kpi-label">Costos fijos</div>
+        <div class="kpi-label" data-i18n="kpi_fixed">Fixed costs</div>
         <div class="kpi-value" id="totalFixed">0.00</div>
       </div>
     </div>
 
     <div class="section-title">
-      Categor&iacute;as de costo
-      <span class="edit-activities-link" id="editActivitiesLink">Editar actividades seleccionadas</span>
+      <span data-i18n="section_categories">Cost categories</span>
+      <span class="edit-activities-link" id="editActivitiesLink" data-i18n="edit_activities_link">Edit selected activities</span>
     </div>
     <div id="categoriesContainer"></div>
 
     <div class="bottom-actions">
-      <button class="btn btn-save" id="saveJsonBtn">Guardar datos (JSON)</button>
-      <button class="btn btn-outline" id="loadJsonBtn">Cargar datos (JSON)</button>
+      <button class="btn btn-save" id="saveJsonBtn" data-i18n="btn_save_json">Save data (JSON)</button>
+      <button class="btn btn-outline" id="loadJsonBtn" data-i18n="btn_load_json">Load data (JSON)</button>
       <input type="file" id="loadJsonFile" accept="application/json,.json" style="display:none;">
-      <button class="btn btn-save" id="saveHtmlBtn">Guardar copia HTML</button>
-      <button class="btn btn-primary" id="exportBtn">Exportar resumen (CSV)</button>
-      <button class="btn btn-outline" id="printBtn">Imprimir / Guardar PDF</button>
-      <button class="btn btn-danger" id="resetBtn">Borrar todos los datos</button>
+      <button class="btn btn-save" id="saveHtmlBtn" data-i18n="btn_save_html">Save HTML copy</button>
+      <button class="btn btn-primary" id="exportBtn" data-i18n="btn_export_csv">Export summary (CSV)</button>
+      <button class="btn btn-outline" id="printBtn" data-i18n="btn_print">Print / Save PDF</button>
+      <button class="btn btn-danger" id="resetBtn" data-i18n="btn_reset">Delete all data</button>
     </div>
 
     <div class="table-card">
-      <h3>Resumen por categor&iacute;a</h3>
-      <div class="table-note">Solo totales &mdash; el detalle por l&iacute;nea queda en el cuestionario, no en este resumen.</div>
+      <h3 data-i18n="table_title">Summary by category</h3>
+      <div class="table-note" data-i18n="table_note"></div>
       <table class="dt" id="summaryTable">
         <thead>
-          <tr><th>Categor&iacute;a</th><th>Modo de entrada</th><th class="num">D&iacute;as MO familiar</th><th class="num">D&iacute;as MO contratada</th><th class="num">Total (MC/unidad de &aacute;rea)</th><th class="num">Precio/kg (presentaci&oacute;n)</th><th class="num">Precio/kg GBE</th></tr>
+          <tr>
+            <th data-i18n="th_category">Category</th>
+            <th data-i18n="th_mode">Entry mode</th>
+            <th class="num" data-i18n="th_hh_days">Family labour days</th>
+            <th class="num" data-i18n="th_hired_days">Paid labour days</th>
+            <th class="num" data-i18n="th_total">Total (currency/area unit)</th>
+            <th class="num" data-i18n="th_price_pres">Price/kg (coffee type)</th>
+            <th class="num" data-i18n="th_price_gbe">Price/kg GBE</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -335,66 +364,259 @@
 
 <script id="appScript">
 // ---- Activity groups (Tab 1), matching the SurveyJS main_activities_* checkboxes ----
+// ==================== TRANSLATIONS ====================
+// Kept deliberately plain/simple in all three languages, since farmers use this tool directly.
+// Default language is English; Spanish and Portuguese (Brazil) are machine-translated first
+// drafts pending native-speaker review.
+const TRANSLATIONS = {
+  en: {
+    app_title: "CPS Calculator", app_subtitle: "FGD data entry",
+    badge: "Temporary tool \u2014 not connected to SurveyJS",
+    notice: "How to use this tool: first, on Tab 1, mark which activities happen on the farm and what type of coffee is sold. Then go to Tab 2, where only the cost questions that apply will show up. Everything you type is saved automatically on this computer. For paid workers, you can enter days worked or a fixed contract amount, whichever is easier. For tools or equipment that last several years (like a sprayer pump), enter how much it cost and how many years it lasts; the tool works out the yearly cost on its own. At the end you can save a copy of the file or download a summary with the totals.",
+    lang_switch_label: "Language:",
+    field_fgd_name: "FGD name or code", field_flo_id: "FLO-ID", field_coop_name: "Cooperative name",
+    field_area_unit: "Area unit", area_unit_ha: "Hectare (ha)", area_unit_mz: "Manzana", area_unit_acre: "Acre", area_unit_other: "Other",
+    field_currency: "Local currency", field_daily_wage: "Daily wage (currency/day)",
+    save_status_auto: "Autosaved", save_status_blocked: "Autosave unavailable in this mode \u2014 use \"Save HTML copy\" before closing",
+    save_status_json: "JSON data downloaded", save_status_html: "HTML copy downloaded",
+    tab1_label: "Farm activities", tab2_label: "Cost questionnaire", continue_btn: "Continue to questionnaire \u2192",
+    presentation_card_title: "Coffee type and yield",
+    presentation_card_desc: "Used to turn the production cost into a price per kg. The GBE conversion ratio (how many kg of this type equal 1 kg GBE) fills in automatically, but you can adjust it.",
+    field_presentation: "Coffee type sold", field_gbe_ratio: "Kg of this type = 1 kg GBE",
+    field_yield: "Real yield (kg/ha, in that type)", field_yield_equiv: "Equivalent yield",
+    presentation_cherry: "Red cherry", presentation_dried_cherry: "Dried cherry", presentation_wet_parchment: "Wet parchment",
+    presentation_dry_parchment: "Dry parchment", presentation_green_bean: "Green bean (GBE)",
+    activity_group1_title: "1. Crop Establishment", activity_group1_desc: "Activities for starting or renewing coffee plots.",
+    activity_group2_title: "2. Crop Management", activity_group2_desc: "Ongoing activities to keep coffee plants healthy and productive.",
+    activity_group3_title: "3. Harvesting and Processing", activity_group3_desc: "Activities to pick the coffee and prepare it for sale.",
+    opt_nursery_establishment: "Nursery Establishment", opt_land_preparation: "Land Preparation", opt_planting_grafting_renovation: "Planting, Grafting and Renovation",
+    opt_fertilization: "Fertilization", opt_pest_disease_control: "Pest and Disease Control", opt_weed_management: "Weed Management", opt_pruning_crop_rejuvenation: "Pruning and Crop Rejuvenation",
+    opt_coffee_harvesting: "Coffee Harvesting", opt_coffee_processing: "Coffee Processing",
+    cat_land_prep: "Land Preparation", cat_renovation: "Nursery Establishment and Planting/Renovation", cat_fertilization: "Fertilization",
+    cat_maintenance: "Pruning and Crop Rejuvenation", cat_ipdm: "Pest and Disease Control", cat_weed: "Weed Management",
+    cat_harvest: "Coffee Harvesting", cat_postharvest: "Coffee Processing", cat_admin: "Farm Administration and Services",
+    ex_land_prep_input: "Machinery rental", ex_land_prep_labour: "Clearing and leveling the land", ex_land_prep_activity: "Leveling the land",
+    ex_renovation_input: "Coffee seedlings", ex_renovation_labour: "Planting seedlings", ex_renovation_activity: "Planting seedlings",
+    ex_fertilization_input: "Urea 46%", ex_fertilization_labour: "Applying fertilizer", ex_fertilization_activity: "Vegetative-stage application",
+    ex_maintenance_input: "Pruning tools", ex_maintenance_labour: "Maintenance pruning", ex_maintenance_activity: "Maintenance pruning",
+    ex_ipdm_input: "Fungicide", ex_ipdm_labour: "Spraying", ex_ipdm_activity: "Coffee borer control",
+    ex_weed_input: "Herbicide", ex_weed_labour: "Manual weeding", ex_weed_activity: "Manual weeding",
+    ex_harvest_input: "Harvest sacks", ex_harvest_labour: "Picking cherries", ex_harvest_activity: "Picking cherries",
+    ex_postharvest_input: "Fuel for pulping machine", ex_postharvest_labour: "Pulping and drying", ex_postharvest_activity: "Pulping and drying",
+    ex_admin_input: "Administrative services", ex_admin_labour: "Farm administration", ex_admin_activity: "Farm administration",
+    ex_default_input: "input", ex_default_labour: "activity", ex_default_activity: "activity",
+    comp_inputs: "Inputs", comp_household: "Family labour", comp_household_hint: "not included in the cost total",
+    comp_hired: "Paid labour", comp_hired_hint: "by day or by contract",
+    comp_variable: "Variable costs", comp_fixed: "Fixed costs", comp_fixed_hint: "purchase cost \u00f7 useful life",
+    mode_global: "Global", mode_activity: "By activity",
+    entrytype_days: "By day", entrytype_lumpsum: "Contract",
+    ph_description_generic: "Description", ph_cost_generic: "Cost description",
+    ph_amount: "amount", ph_days: "days", ph_fixed_amount: "fixed amount", ph_purchase_cost: "purchase cost", ph_useful_life: "useful life (years)",
+    ph_activity_name: "Activity name (e.g.", ph_tool_equipment: "Description (e.g. tool or equipment)",
+    add_entry_prefix: "+ Add", add_activity_btn: "+ Add activity", remove_btn_title: "Remove",
+    kpi_total: "CPS Total", kpi_total_unit: "currency/unit", kpi_inputs: "Inputs", kpi_household_days: "Family labour days",
+    kpi_hired_cost: "Paid labour (cost)", kpi_hired_days: "Paid labour days", kpi_variable: "Variable costs", kpi_fixed: "Fixed costs",
+    section_categories: "Cost categories", edit_activities_link: "Edit selected activities",
+    empty_categories: "No activities selected yet.", empty_categories_link: "Go to Tab 1 to select the farm's activities.",
+    empty_summary: "No category selected.",
+    subtotal_prefix: "Subtotal", subtotal_unit: "currency / area unit",
+    subtotal_note: "Family labour:", subtotal_note_mid: "days \u00b7 Paid labour:", subtotal_note_wage: "days (wage",
+    btn_save_json: "Save data (JSON)", btn_load_json: "Load data (JSON)", btn_save_html: "Save HTML copy",
+    btn_export_csv: "Export summary (CSV)", btn_print: "Print / Save PDF", btn_reset: "Delete all data",
+    table_title: "Summary by category", table_note: "Totals only \u2014 the line-by-line detail stays in the questionnaire, not in this summary.",
+    th_category: "Category", th_mode: "Entry mode", th_hh_days: "Family labour days", th_hired_days: "Paid labour days",
+    th_total: "Total (currency/area unit)", th_price_pres: "Price/kg (coffee type)", th_price_gbe: "Price/kg GBE",
+    total_cps_row: "Total CPS",
+    confirm_reset: "This will delete all the data entered for this FGD. Continue?",
+    confirm_json_load: "This will replace what's on screen right now with the data from \"FILENAME\". Continue?",
+    alert_json_invalid: "This isn't a valid file from this calculator. No data was loaded.",
+    yield_gbe_suffix: "kg GBE/ha",
+    unit_per_year: "/year", unit_per_ha: "/ha", cost_colon: "Cost:"
+  },
+  es: {
+    app_title: "Calculadora CPS", app_subtitle: "Captura en FGD",
+    badge: "Herramienta temporal \u2014 sin conexi\u00f3n a SurveyJS",
+    notice: "C\u00f3mo usar esta herramienta: primero, en la Pesta\u00f1a 1, marquen qu\u00e9 actividades hacen en la finca y qu\u00e9 tipo de caf\u00e9 venden. Luego pasen a la Pesta\u00f1a 2, donde solo aparecer\u00e1n las preguntas de costos que les corresponden. Todo lo que escriban queda guardado autom\u00e1ticamente en este computador. Para el pago a trabajadores contratados, pueden anotar los d\u00edas trabajados o el monto de un contrato, lo que sea m\u00e1s f\u00e1cil. Para herramientas o equipos que duran varios a\u00f1os (como una bomba de fumigar), anoten cu\u00e1nto costaron y cu\u00e1ntos a\u00f1os duran; la herramienta calcula sola cu\u00e1nto corresponde por a\u00f1o. Al final pueden guardar una copia del archivo o descargar un resumen con los totales.",
+    lang_switch_label: "Idioma:",
+    field_fgd_name: "Nombre o c\u00f3digo del FGD", field_flo_id: "FLO-ID", field_coop_name: "Nombre de la cooperativa",
+    field_area_unit: "Unidad de \u00e1rea", area_unit_ha: "Hect\u00e1rea (ha)", area_unit_mz: "Manzana", area_unit_acre: "Acre", area_unit_other: "Otra",
+    field_currency: "Moneda local", field_daily_wage: "Jornal diario (moneda/d\u00eda)",
+    save_status_auto: "Guardado", save_status_blocked: "Guardado autom\u00e1tico no disponible en este modo \u2014 use \"Guardar copia HTML\" antes de cerrar",
+    save_status_json: "Datos JSON descargados", save_status_html: "Copia HTML descargada",
+    tab1_label: "Actividades de la finca", tab2_label: "Cuestionario de costos", continue_btn: "Continuar al cuestionario \u2192",
+    presentation_card_title: "Presentaci\u00f3n del caf\u00e9 y rendimiento",
+    presentation_card_desc: "Se usa para convertir el costo de producci\u00f3n en un precio por kg. El ratio de conversi\u00f3n a GBE (cu\u00e1ntos kg de esta presentaci\u00f3n equivalen a 1 kg GBE) se autocompleta, pero puede ajustarlo.",
+    field_presentation: "Presentaci\u00f3n del caf\u00e9", field_gbe_ratio: "Kg de esta presentaci\u00f3n = 1 kg GBE",
+    field_yield: "Rendimiento real (kg/ha en esa presentaci\u00f3n)", field_yield_equiv: "Rendimiento equivalente",
+    presentation_cherry: "Cereza roja", presentation_dried_cherry: "Cereza seca", presentation_wet_parchment: "Pergamino h\u00famedo",
+    presentation_dry_parchment: "Pergamino seco", presentation_green_bean: "Grano verde (GBE)",
+    activity_group1_title: "1. Establecimiento del Cultivo", activity_group1_desc: "Actividades relacionadas con el inicio o la renovaci\u00f3n de los lotes de caf\u00e9.",
+    activity_group2_title: "2. Manejo del Cultivo", activity_group2_desc: "Actividades continuas para mantener las plantas de caf\u00e9 sanas y productivas.",
+    activity_group3_title: "3. Cosecha y Procesamiento", activity_group3_desc: "Actividades para recolectar el caf\u00e9 y prepararlo para la venta.",
+    opt_nursery_establishment: "Establecimiento de Vivero", opt_land_preparation: "Preparaci\u00f3n de Tierra", opt_planting_grafting_renovation: "Siembra, Injerto y Renovaci\u00f3n",
+    opt_fertilization: "Fertilizaci\u00f3n", opt_pest_disease_control: "Control de Plagas y Enfermedades", opt_weed_management: "Manejo de Malezas", opt_pruning_crop_rejuvenation: "Poda y Rejuvenecimiento del Cultivo",
+    opt_coffee_harvesting: "Cosecha de Caf\u00e9", opt_coffee_processing: "Procesamiento de Caf\u00e9",
+    cat_land_prep: "Preparaci\u00f3n de Tierra", cat_renovation: "Establecimiento de Vivero y Siembra/Renovaci\u00f3n", cat_fertilization: "Fertilizaci\u00f3n",
+    cat_maintenance: "Poda y Rejuvenecimiento del Cultivo", cat_ipdm: "Control de Plagas y Enfermedades", cat_weed: "Manejo de Malezas",
+    cat_harvest: "Cosecha de Caf\u00e9", cat_postharvest: "Procesamiento de Caf\u00e9", cat_admin: "Administraci\u00f3n y Servicios de la Finca",
+    ex_land_prep_input: "Alquiler de maquinaria", ex_land_prep_labour: "Limpieza y nivelaci\u00f3n del terreno", ex_land_prep_activity: "Nivelaci\u00f3n del terreno",
+    ex_renovation_input: "Pl\u00e1ntulas de caf\u00e9", ex_renovation_labour: "Siembra de pl\u00e1ntulas", ex_renovation_activity: "Siembra de pl\u00e1ntulas",
+    ex_fertilization_input: "Urea 46%", ex_fertilization_labour: "Aplicaci\u00f3n de fertilizante", ex_fertilization_activity: "Aplicaci\u00f3n etapa vegetativa",
+    ex_maintenance_input: "Herramientas de poda", ex_maintenance_labour: "Poda de mantenimiento", ex_maintenance_activity: "Poda de mantenimiento",
+    ex_ipdm_input: "Fungicida", ex_ipdm_labour: "Fumigaci\u00f3n", ex_ipdm_activity: "Control de broca",
+    ex_weed_input: "Herbicida", ex_weed_labour: "Deshierbe manual", ex_weed_activity: "Deshierbe manual",
+    ex_harvest_input: "Sacos de cosecha", ex_harvest_labour: "Recolecci\u00f3n de cerezas", ex_harvest_activity: "Recolecci\u00f3n de cerezas",
+    ex_postharvest_input: "Combustible para despulpadora", ex_postharvest_labour: "Despulpado y secado", ex_postharvest_activity: "Despulpado y secado",
+    ex_admin_input: "Servicios administrativos", ex_admin_labour: "Gesti\u00f3n administrativa", ex_admin_activity: "Gesti\u00f3n administrativa",
+    ex_default_input: "insumo", ex_default_labour: "actividad", ex_default_activity: "actividad",
+    comp_inputs: "Insumos", comp_household: "Mano de obra familiar", comp_household_hint: "no se incluye en el costo total",
+    comp_hired: "Mano de obra contratada", comp_hired_hint: "por jornal o por contrato",
+    comp_variable: "Costos variables", comp_fixed: "Costos fijos", comp_fixed_hint: "costo de compra \u00f7 vida \u00fatil",
+    mode_global: "Entrada Global", mode_activity: "Por actividad",
+    entrytype_days: "Jornal", entrytype_lumpsum: "Contrato",
+    ph_description_generic: "Descripci\u00f3n", ph_cost_generic: "Descripci\u00f3n del costo",
+    ph_amount: "monto", ph_days: "d\u00edas", ph_fixed_amount: "monto fijo", ph_purchase_cost: "costo de compra", ph_useful_life: "vida \u00fatil (a\u00f1os)",
+    ph_activity_name: "Nombre de la actividad (ej.", ph_tool_equipment: "Descripci\u00f3n (ej. herramienta o equipo)",
+    add_entry_prefix: "+ Agregar", add_activity_btn: "+ Agregar actividad", remove_btn_title: "Eliminar",
+    kpi_total: "CPS Total", kpi_total_unit: "moneda/unidad", kpi_inputs: "Insumos", kpi_household_days: "D\u00edas MO familiar",
+    kpi_hired_cost: "MO contratada (costo)", kpi_hired_days: "D\u00edas MO contratada", kpi_variable: "Costos variables", kpi_fixed: "Costos fijos",
+    section_categories: "Categor\u00edas de costo", edit_activities_link: "Editar actividades seleccionadas",
+    empty_categories: "Ninguna actividad seleccionada todav\u00eda.", empty_categories_link: "Ve a la pesta\u00f1a 1 para seleccionar las actividades de la finca.",
+    empty_summary: "Ninguna categor\u00eda seleccionada.",
+    subtotal_prefix: "Subtotal", subtotal_unit: "moneda / unidad de \u00e1rea",
+    subtotal_note: "MO familiar:", subtotal_note_mid: "d\u00edas \u00b7 MO contratada:", subtotal_note_wage: "d\u00edas (jornal",
+    btn_save_json: "Guardar datos (JSON)", btn_load_json: "Cargar datos (JSON)", btn_save_html: "Guardar copia HTML",
+    btn_export_csv: "Exportar resumen (CSV)", btn_print: "Imprimir / Guardar PDF", btn_reset: "Borrar todos los datos",
+    table_title: "Resumen por categor\u00eda", table_note: "Solo totales \u2014 el detalle por l\u00ednea queda en el cuestionario, no en este resumen.",
+    th_category: "Categor\u00eda", th_mode: "Modo de entrada", th_hh_days: "D\u00edas MO familiar", th_hired_days: "D\u00edas MO contratada",
+    th_total: "Total (moneda/unidad de \u00e1rea)", th_price_pres: "Precio/kg (presentaci\u00f3n)", th_price_gbe: "Precio/kg GBE",
+    total_cps_row: "Total CPS",
+    confirm_reset: "Esto borrar\u00e1 todos los datos capturados en este FGD. \u00bfContinuar?",
+    confirm_json_load: "Esto reemplazar\u00e1 los datos que est\u00e1n en pantalla ahora mismo con los del archivo \"FILENAME\". \u00bfContinuar?",
+    alert_json_invalid: "Este archivo no es un JSON v\u00e1lido de la calculadora. No se cargaron datos.",
+    yield_gbe_suffix: "kg GBE/ha",
+    unit_per_year: "/a\u00f1o", unit_per_ha: "/ha", cost_colon: "Costo:"
+  },
+  pt: {
+    app_title: "Calculadora CPS", app_subtitle: "Coleta no FGD",
+    badge: "Ferramenta tempor\u00e1ria \u2014 sem conex\u00e3o com o SurveyJS",
+    notice: "Como usar esta ferramenta: primeiro, na Aba 1, marquem quais atividades s\u00e3o feitas na propriedade e qual tipo de caf\u00e9 \u00e9 vendido. Depois v\u00e3o para a Aba 2, onde s\u00f3 aparecem as perguntas de custo que se aplicam. Tudo que vocês digitarem fica salvo automaticamente neste computador. Para trabalhadores contratados, podem anotar os dias trabalhados ou o valor de um contrato, o que for mais f\u00e1cil. Para ferramentas ou equipamentos que duram v\u00e1rios anos (como uma bomba de pulverizar), anotem quanto custou e quantos anos dura; a ferramenta calcula sozinha quanto corresponde por ano. No final podem salvar uma c\u00f3pia do arquivo ou baixar um resumo com os totais.",
+    lang_switch_label: "Idioma:",
+    field_fgd_name: "Nome ou c\u00f3digo do FGD", field_flo_id: "FLO-ID", field_coop_name: "Nome da cooperativa",
+    field_area_unit: "Unidade de \u00e1rea", area_unit_ha: "Hectare (ha)", area_unit_mz: "Manzana", area_unit_acre: "Acre", area_unit_other: "Outra",
+    field_currency: "Moeda local", field_daily_wage: "Di\u00e1ria (moeda/dia)",
+    save_status_auto: "Salvo", save_status_blocked: "Salvamento autom\u00e1tico indispon\u00edvel neste modo \u2014 use \"Salvar c\u00f3pia HTML\" antes de fechar",
+    save_status_json: "Dados JSON baixados", save_status_html: "C\u00f3pia HTML baixada",
+    tab1_label: "Atividades da propriedade", tab2_label: "Question\u00e1rio de custos", continue_btn: "Continuar para o question\u00e1rio \u2192",
+    presentation_card_title: "Tipo de caf\u00e9 e produtividade",
+    presentation_card_desc: "Usado para transformar o custo de produ\u00e7\u00e3o em pre\u00e7o por kg. A raz\u00e3o de convers\u00e3o para GBE (quantos kg desse tipo equivalem a 1 kg GBE) \u00e9 preenchida automaticamente, mas pode ser ajustada.",
+    field_presentation: "Tipo de caf\u00e9 vendido", field_gbe_ratio: "Kg deste tipo = 1 kg GBE",
+    field_yield: "Produtividade real (kg/ha, nesse tipo)", field_yield_equiv: "Produtividade equivalente",
+    presentation_cherry: "Cereja", presentation_dried_cherry: "Cereja seca", presentation_wet_parchment: "Perg. lavado",
+    presentation_dry_parchment: "Perg. seco", presentation_green_bean: "Verde (GBE)",
+    activity_group1_title: "1. Implanta\u00e7\u00e3o da Lavoura", activity_group1_desc: "Atividades para iniciar ou renovar os talh\u00f5es de caf\u00e9.",
+    activity_group2_title: "2. Manejo da Lavoura", activity_group2_desc: "Atividades cont\u00ednuas para manter as plantas de caf\u00e9 saud\u00e1veis e produtivas.",
+    activity_group3_title: "3. Colheita e Processamento", activity_group3_desc: "Atividades para colher o caf\u00e9 e prepar\u00e1-lo para venda.",
+    opt_nursery_establishment: "Forma\u00e7\u00e3o de Viveiro", opt_land_preparation: "Preparo do Solo", opt_planting_grafting_renovation: "Plantio, Enxertia e Renova\u00e7\u00e3o",
+    opt_fertilization: "Aduba\u00e7\u00e3o", opt_pest_disease_control: "Controle de Pragas e Doen\u00e7as", opt_weed_management: "Controle de Plantas Daninhas", opt_pruning_crop_rejuvenation: "Poda e Recepa",
+    opt_coffee_harvesting: "Colheita do Caf\u00e9", opt_coffee_processing: "Processamento do Caf\u00e9",
+    cat_land_prep: "Preparo do Solo", cat_renovation: "Forma\u00e7\u00e3o de Viveiro e Plantio/Renova\u00e7\u00e3o", cat_fertilization: "Aduba\u00e7\u00e3o",
+    cat_maintenance: "Poda e Recepa", cat_ipdm: "Controle de Pragas e Doen\u00e7as", cat_weed: "Controle de Plantas Daninhas",
+    cat_harvest: "Colheita do Caf\u00e9", cat_postharvest: "Processamento do Caf\u00e9", cat_admin: "Administra\u00e7\u00e3o e Servi\u00e7os da Propriedade",
+    ex_land_prep_input: "Aluguel de m\u00e1quinas", ex_land_prep_labour: "Limpeza e nivelamento do terreno", ex_land_prep_activity: "Nivelamento do terreno",
+    ex_renovation_input: "Mudas de caf\u00e9", ex_renovation_labour: "Plantio de mudas", ex_renovation_activity: "Plantio de mudas",
+    ex_fertilization_input: "Ureia 46%", ex_fertilization_labour: "Aplica\u00e7\u00e3o de adubo", ex_fertilization_activity: "Aplica\u00e7\u00e3o na fase vegetativa",
+    ex_maintenance_input: "Ferramentas de poda", ex_maintenance_labour: "Poda de manuten\u00e7\u00e3o", ex_maintenance_activity: "Poda de manuten\u00e7\u00e3o",
+    ex_ipdm_input: "Fungicida", ex_ipdm_labour: "Pulveriza\u00e7\u00e3o", ex_ipdm_activity: "Controle da broca",
+    ex_weed_input: "Herbicida", ex_weed_labour: "Capina manual", ex_weed_activity: "Capina manual",
+    ex_harvest_input: "Sacos de colheita", ex_harvest_labour: "Colheita dos gr\u00e3os", ex_harvest_activity: "Colheita dos gr\u00e3os",
+    ex_postharvest_input: "Combust\u00edvel para despolpadeira", ex_postharvest_labour: "Despolpa e secagem", ex_postharvest_activity: "Despolpa e secagem",
+    ex_admin_input: "Servi\u00e7os administrativos", ex_admin_labour: "Gest\u00e3o administrativa", ex_admin_activity: "Gest\u00e3o administrativa",
+    ex_default_input: "insumo", ex_default_labour: "atividade", ex_default_activity: "atividade",
+    comp_inputs: "Insumos", comp_household: "M\u00e3o de obra familiar", comp_household_hint: "n\u00e3o entra no custo total",
+    comp_hired: "M\u00e3o de obra contratada", comp_hired_hint: "por di\u00e1ria ou por contrato",
+    comp_variable: "Custos vari\u00e1veis", comp_fixed: "Custos fixos", comp_fixed_hint: "custo de compra \u00f7 vida \u00fatil",
+    mode_global: "Global", mode_activity: "Por atividade",
+    entrytype_days: "Di\u00e1ria", entrytype_lumpsum: "Contrato",
+    ph_description_generic: "Descri\u00e7\u00e3o", ph_cost_generic: "Descri\u00e7\u00e3o do custo",
+    ph_amount: "valor", ph_days: "dias", ph_fixed_amount: "valor fixo", ph_purchase_cost: "custo de compra", ph_useful_life: "vida \u00fatil (anos)",
+    ph_activity_name: "Nome da atividade (ex.", ph_tool_equipment: "Descri\u00e7\u00e3o (ex. ferramenta ou equipamento)",
+    add_entry_prefix: "+ Adicionar", add_activity_btn: "+ Adicionar atividade", remove_btn_title: "Remover",
+    kpi_total: "CPS Total", kpi_total_unit: "moeda/unidade", kpi_inputs: "Insumos", kpi_household_days: "Dias MO familiar",
+    kpi_hired_cost: "MO contratada (custo)", kpi_hired_days: "Dias MO contratada", kpi_variable: "Custos vari\u00e1veis", kpi_fixed: "Custos fixos",
+    section_categories: "Categorias de custo", edit_activities_link: "Editar atividades selecionadas",
+    empty_categories: "Nenhuma atividade selecionada ainda.", empty_categories_link: "V\u00e1 \u00e0 Aba 1 para selecionar as atividades da propriedade.",
+    empty_summary: "Nenhuma categoria selecionada.",
+    subtotal_prefix: "Subtotal", subtotal_unit: "moeda / unidade de \u00e1rea",
+    subtotal_note: "MO familiar:", subtotal_note_mid: "dias \u00b7 MO contratada:", subtotal_note_wage: "dias (di\u00e1ria",
+    btn_save_json: "Salvar dados (JSON)", btn_load_json: "Carregar dados (JSON)", btn_save_html: "Salvar c\u00f3pia HTML",
+    btn_export_csv: "Exportar resumo (CSV)", btn_print: "Imprimir / Salvar PDF", btn_reset: "Apagar todos os dados",
+    table_title: "Resumo por categoria", table_note: "Somente totais \u2014 o detalhe linha a linha fica no question\u00e1rio, n\u00e3o neste resumo.",
+    th_category: "Categoria", th_mode: "Modo de entrada", th_hh_days: "Dias MO familiar", th_hired_days: "Dias MO contratada",
+    th_total: "Total (moeda/unidade de \u00e1rea)", th_price_pres: "Pre\u00e7o/kg (tipo)", th_price_gbe: "Pre\u00e7o/kg GBE",
+    total_cps_row: "Total CPS",
+    confirm_reset: "Isso vai apagar todos os dados deste FGD. Continuar?",
+    confirm_json_load: "Isso vai substituir os dados que est\u00e3o na tela agora pelos do arquivo \"FILENAME\". Continuar?",
+    alert_json_invalid: "Este arquivo n\u00e3o \u00e9 um JSON v\u00e1lido desta calculadora. Nenhum dado foi carregado.",
+    yield_gbe_suffix: "kg GBE/ha",
+    unit_per_year: "/ano", unit_per_ha: "/ha", cost_colon: "Custo:"
+  }
+};
+function t(key){
+  const lang = (state && state.lang) || "en";
+  return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS.en[key] || key;
+}
+
+// ---- Farm activity groups (Tab 1), matching the SurveyJS main_activities_* checkboxes ----
 const ACTIVITY_GROUPS = [
   {
-    id: "crop_establishment",
-    title: "1. Establecimiento del Cultivo",
-    description: "Actividades relacionadas con el inicio o la renovaci\u00f3n de los lotes de caf\u00e9.",
+    id: "crop_establishment", titleKey: "activity_group1_title", descKey: "activity_group1_desc",
     options: [
-      { value: "nursery_establishment", label: "Establecimiento de Vivero" },
-      { value: "land_preparation", label: "Preparaci\u00f3n de Tierra" },
-      { value: "planting_grafting_renovation", label: "Siembra, Injerto y Renovaci\u00f3n" }
+      { value: "nursery_establishment", labelKey: "opt_nursery_establishment" },
+      { value: "land_preparation", labelKey: "opt_land_preparation" },
+      { value: "planting_grafting_renovation", labelKey: "opt_planting_grafting_renovation" }
     ]
   },
   {
-    id: "crop_management",
-    title: "2. Manejo del Cultivo",
-    description: "Actividades continuas para mantener las plantas de caf\u00e9 sanas y productivas.",
+    id: "crop_management", titleKey: "activity_group2_title", descKey: "activity_group2_desc",
     options: [
-      { value: "fertilization", label: "Fertilizaci\u00f3n" },
-      { value: "pest_disease_control", label: "Control de Plagas y Enfermedades" },
-      { value: "weed_management", label: "Manejo de Malezas" },
-      { value: "pruning_crop_rejuvenation", label: "Poda y Rejuvenecimiento del Cultivo" }
+      { value: "fertilization", labelKey: "opt_fertilization" },
+      { value: "pest_disease_control", labelKey: "opt_pest_disease_control" },
+      { value: "weed_management", labelKey: "opt_weed_management" },
+      { value: "pruning_crop_rejuvenation", labelKey: "opt_pruning_crop_rejuvenation" }
     ]
   },
   {
-    id: "harvesting_processing",
-    title: "3. Cosecha y Procesamiento",
-    description: "Actividades para recolectar el caf\u00e9 y prepararlo para la venta.",
+    id: "harvesting_processing", titleKey: "activity_group3_title", descKey: "activity_group3_desc",
     options: [
-      { value: "coffee_harvesting", label: "Cosecha de Caf\u00e9" },
-      { value: "coffee_processing", label: "Procesamiento de Caf\u00e9" }
+      { value: "coffee_harvesting", labelKey: "opt_coffee_harvesting" },
+      { value: "coffee_processing", labelKey: "opt_coffee_processing" }
     ]
   }
 ];
 
-// ---- Categories (Tier 1), gated by the activity selections above. gate:null = always visible (Administracion). ----
+// ---- Categories (Tier 1), gated by the activity selections above. gate:null = always visible (Administration). ----
 const CATEGORIES = [
-  { id: "land_prep",    label: "Preparaci\u00f3n de Tierra",                              gate: { group: "crop_establishment", values: ["land_preparation"] } },
-  { id: "renovation",   label: "Establecimiento de Vivero y Siembra/Renovaci\u00f3n",       gate: { group: "crop_establishment", values: ["nursery_establishment", "planting_grafting_renovation"] } },
-  { id: "fertilization",label: "Fertilizaci\u00f3n",                                        gate: { group: "crop_management", values: ["fertilization"] } },
-  { id: "maintenance",  label: "Poda y Rejuvenecimiento del Cultivo",                       gate: { group: "crop_management", values: ["pruning_crop_rejuvenation"] } },
-  { id: "ipdm",         label: "Control de Plagas y Enfermedades",                          gate: { group: "crop_management", values: ["pest_disease_control"] } },
-  { id: "weed",         label: "Manejo de Malezas",                                         gate: { group: "crop_management", values: ["weed_management"] } },
-  { id: "harvest",      label: "Cosecha de Caf\u00e9",                                      gate: { group: "harvesting_processing", values: ["coffee_harvesting"] } },
-  { id: "postharvest",  label: "Procesamiento de Caf\u00e9",                                gate: { group: "harvesting_processing", values: ["coffee_processing"] } },
-  { id: "admin",        label: "Administraci\u00f3n y Servicios de la Finca",               gate: null, excludeComponents: ["inputs", "hired"] }
+  { id: "land_prep",    labelKey: "cat_land_prep",    gate: { group: "crop_establishment", values: ["land_preparation"] } },
+  { id: "renovation",   labelKey: "cat_renovation",   gate: { group: "crop_establishment", values: ["nursery_establishment", "planting_grafting_renovation"] } },
+  { id: "fertilization",labelKey: "cat_fertilization",gate: { group: "crop_management", values: ["fertilization"] } },
+  { id: "maintenance",  labelKey: "cat_maintenance",  gate: { group: "crop_management", values: ["pruning_crop_rejuvenation"] } },
+  { id: "ipdm",         labelKey: "cat_ipdm",         gate: { group: "crop_management", values: ["pest_disease_control"] } },
+  { id: "weed",         labelKey: "cat_weed",         gate: { group: "crop_management", values: ["weed_management"] } },
+  { id: "harvest",      labelKey: "cat_harvest",      gate: { group: "harvesting_processing", values: ["coffee_harvesting"] } },
+  { id: "postharvest",  labelKey: "cat_postharvest",  gate: { group: "harvesting_processing", values: ["coffee_processing"] } },
+  { id: "admin",        labelKey: "cat_admin",        gate: null, excludeComponents: ["inputs", "hired"] }
 ];
 
 // Per-category example text for entry placeholders, so hints don't all read like fertilization.
-const CATEGORY_EXAMPLES = {
-  land_prep:     { input: "Alquiler de maquinaria",        labour: "Limpieza y nivelaci\u00f3n del terreno", activity: "Nivelaci\u00f3n del terreno" },
-  renovation:    { input: "Pl\u00e1ntulas de caf\u00e9",   labour: "Siembra de pl\u00e1ntulas",               activity: "Siembra de pl\u00e1ntulas" },
-  fertilization: { input: "Urea 46%",                       labour: "Aplicaci\u00f3n de fertilizante",         activity: "Aplicaci\u00f3n etapa vegetativa" },
-  maintenance:   { input: "Herramientas de poda",           labour: "Poda de mantenimiento",                   activity: "Poda de mantenimiento" },
-  ipdm:          { input: "Fungicida",                      labour: "Fumigaci\u00f3n",                          activity: "Control de broca" },
-  weed:          { input: "Herbicida",                      labour: "Deshierbe manual",                        activity: "Deshierbe manual" },
-  harvest:       { input: "Sacos de cosecha",               labour: "Recolecci\u00f3n de cerezas",             activity: "Recolecci\u00f3n de cerezas" },
-  postharvest:   { input: "Combustible para despulpadora",  labour: "Despulpado y secado",                     activity: "Despulpado y secado" },
-  admin:         { input: "Servicios administrativos",      labour: "Gesti\u00f3n administrativa",             activity: "Gesti\u00f3n administrativa" }
+const CATEGORY_EXAMPLE_KEYS = {
+  land_prep: "land_prep", renovation: "renovation", fertilization: "fertilization", maintenance: "maintenance",
+  ipdm: "ipdm", weed: "weed", harvest: "harvest", postharvest: "postharvest", admin: "admin"
 };
 function categoryExamples(catId){
-  return CATEGORY_EXAMPLES[catId] || { input: "insumo", labour: "actividad", activity: "actividad" };
+  const k = CATEGORY_EXAMPLE_KEYS[catId];
+  if(!k) return { input: t("ex_default_input"), labour: t("ex_default_labour"), activity: t("ex_default_activity") };
+  return { input: t(`ex_${k}_input`), labour: t(`ex_${k}_labour`), activity: t(`ex_${k}_activity`) };
 }
 function componentsForCategory(cat){
   const exclude = cat.excludeComponents || [];
@@ -406,26 +628,25 @@ function categoryById(catId){
 
 // Tier 3 components.
 const COMPONENTS = [
-  { id: "inputs",    label: "Insumos",                 type: "currency", costed: true  },
-  { id: "household", label: "Mano de obra familiar",   type: "days",     costed: false, hint: "no se incluye en el costo total" },
-  { id: "hired",     label: "Mano de obra contratada", type: "days",     costed: true,  hint: "por jornal o por contrato", hasContractOption: true },
-  { id: "variable",  label: "Costos variables",        type: "currency", costed: true  },
-  { id: "fixed",     label: "Costos fijos",            type: "currency", costed: true,  hasDepreciation: true, hint: "costo de compra \u00f7 vida \u00fatil" }
+  { id: "inputs",    labelKey: "comp_inputs",    type: "currency", costed: true  },
+  { id: "household", labelKey: "comp_household", type: "days",     costed: false, hintKey: "comp_household_hint" },
+  { id: "hired",     labelKey: "comp_hired",     type: "days",     costed: true,  hintKey: "comp_hired_hint", hasContractOption: true },
+  { id: "variable",  labelKey: "comp_variable",  type: "currency", costed: true  },
+  { id: "fixed",     labelKey: "comp_fixed",     type: "currency", costed: true,  hasDepreciation: true, hintKey: "comp_fixed_hint" }
 ];
 
-// Coffee presentation options and GBE conversion factors. cherry/dry_parchment come from FI's
-// own survey glossary; dried_cherry per Jonnathan (0.50); wet_parchment intentionally left blank
-// (no confirmed factor yet) rather than guessed.
+// Coffee presentation options and GBE conversion ratios (kg of that presentation per 1 kg GBE).
+// cherry/dry_parchment derived from FI's own survey glossary; dried_cherry and wet_parchment per Jonnathan.
 const PRESENTATIONS = [
-  { value: "cherry",        label: "Cereza roja",        defaultRatio: "5.00" },
-  { value: "dried_cherry",  label: "Cereza seca",        defaultRatio: "2.00" },
-  { value: "wet_parchment", label: "Pergamino h\u00famedo", defaultRatio: "2.56" },
-  { value: "dry_parchment", label: "Pergamino seco",     defaultRatio: "1.25" },
-  { value: "green_bean",    label: "Grano verde (GBE)",  defaultRatio: "1.00" }
+  { value: "cherry",        labelKey: "presentation_cherry",        defaultRatio: "5.00" },
+  { value: "dried_cherry",  labelKey: "presentation_dried_cherry",  defaultRatio: "2.00" },
+  { value: "wet_parchment", labelKey: "presentation_wet_parchment", defaultRatio: "2.56" },
+  { value: "dry_parchment", labelKey: "presentation_dry_parchment", defaultRatio: "1.25" },
+  { value: "green_bean",    labelKey: "presentation_green_bean",    defaultRatio: "1.00" }
 ];
 function presentationLabel(value){
   const p = PRESENTATIONS.find(p => p.value === value);
-  return p ? p.label : value;
+  return p ? t(p.labelKey) : value;
 }
 
 const STORAGE_KEY = "cosp_fgd_calculator_state_v5";
@@ -470,7 +691,8 @@ function defaultState(){
     };
   });
   return {
-    fgdName: "", areaUnit: "ha", currency: "", dailyWage: "",
+    lang: "en",
+    fgdName: "", floId: "", coopName: "", areaUnit: "ha", currency: "", dailyWage: "",
     presentation: "cherry", gbeRatio: "5.00", yieldPerHa: "",
     selectedActivities: emptyActivitiesState(),
     activeTab: "activities",
@@ -559,11 +781,11 @@ let state = loadState();
 function saveState(){
   try{
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    document.getElementById("saveStatus").textContent = "Guardado " + new Date().toLocaleTimeString();
+    document.getElementById("saveStatus").textContent = t("save_status_auto") + " " + new Date().toLocaleTimeString();
   }catch(e){
     // localStorage can be blocked when a file is opened by double-click (file:// origin).
     // Data still lives in memory and "Guardar copia HTML" still works, so don't let this stop anything else.
-    document.getElementById("saveStatus").textContent = "Guardado autom\u00e1tico no disponible en este modo \u2014 use \u2018Guardar copia HTML\u2019 antes de cerrar";
+    document.getElementById("saveStatus").textContent = t("save_status_blocked");
   }
 }
 
@@ -688,15 +910,15 @@ function renderActivitiesTab(){
     const selected = state.selectedActivities[group.id] || [];
     return `
       <div class="activity-group-card">
-        <h3>${group.title}</h3>
-        <div class="group-desc">${group.description}</div>
+        <h3>${t(group.titleKey)}</h3>
+        <div class="group-desc">${t(group.descKey)}</div>
         <div class="activity-choices">
           ${group.options.map(opt => {
             const checked = selected.includes(opt.value);
             return `
               <label class="activity-choice ${checked ? 'checked' : ''}">
                 <input type="checkbox" data-activity-group="${group.id}" data-activity-value="${opt.value}" ${checked ? 'checked' : ''}>
-                ${opt.label}
+                ${t(opt.labelKey)}
               </label>`;
           }).join("")}
         </div>
@@ -722,7 +944,7 @@ function renderActivitiesTab(){
 
 function globalComponentHtml(catId, comp, catState){
   const entries = catState.global[comp.id];
-  const hintHtml = comp.hint ? ` <span class="c-hint">(${comp.hint})</span>` : "";
+  const hintHtml = comp.hintKey ? ` <span class="c-hint">(${t(comp.hintKey)})</span>` : "";
   let subtotalHtml;
   if(comp.hasDepreciation){
     subtotalHtml = fmt(entries.reduce((s,e) => s + depreciatedAnnualCost(e), 0));
@@ -731,13 +953,13 @@ function globalComponentHtml(catId, comp, catState){
   } else if(comp.hasContractOption){
     const cost = entries.reduce((s,e) => s + (e.entryType === "lumpsum" ? num(e.value) : num(e.days) * wage()), 0);
     const days = entries.reduce((s,e) => s + (e.entryType === "lumpsum" ? 0 : num(e.days)), 0);
-    subtotalHtml = `${fmt(cost)}<span class="c-subtotal-days">${fmtDays(days)} d\u00edas</span>`;
+    subtotalHtml = `${fmt(cost)}<span class="c-subtotal-days">${fmtDays(days)} ${t("ph_days")}</span>`;
   } else if(comp.costed){
     const days = entries.reduce((s,e) => s + num(e.days), 0);
-    subtotalHtml = `${fmt(days * wage())}<span class="c-subtotal-days">${fmtDays(days)} d\u00edas</span>`;
+    subtotalHtml = `${fmt(days * wage())}<span class="c-subtotal-days">${fmtDays(days)} ${t("ph_days")}</span>`;
   } else {
     const days = entries.reduce((s,e) => s + num(e.days), 0);
-    subtotalHtml = `${fmtDays(days)} d\u00edas`;
+    subtotalHtml = `${fmtDays(days)} ${t("ph_days")}`;
   }
 
   const rowsHtml = entries.map((entry, i) => {
@@ -746,19 +968,19 @@ function globalComponentHtml(catId, comp, catState){
       const annual = depreciatedAnnualCost(entry);
       return `
         <div class="entry-row">
-          <input type="text" placeholder="Descripci\u00f3n (ej. herramienta o equipo)" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
-          <input type="number" step="any" min="0" placeholder="costo compra MC" data-path="categories.${catId}.global.${comp.id}.${i}.purchaseCost" value="${entry.purchaseCost || ''}">
-          <input type="number" step="any" min="1" placeholder="vida \u00fatil (a\u00f1os)" data-path="categories.${catId}.global.${comp.id}.${i}.usefulLife" value="${entry.usefulLife || ''}">
-          <span class="computed-cost" data-entry-cost="${catId}|${comp.id}|${i}">${fmt(annual)}/a\u00f1o</span>
-          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="Eliminar">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
+          <input type="text" placeholder="${t('ph_tool_equipment')}" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
+          <input type="number" step="any" min="0" placeholder="${t('ph_purchase_cost')}" data-path="categories.${catId}.global.${comp.id}.${i}.purchaseCost" value="${entry.purchaseCost || ''}">
+          <input type="number" step="any" min="1" placeholder="${t('ph_useful_life')}" data-path="categories.${catId}.global.${comp.id}.${i}.usefulLife" value="${entry.usefulLife || ''}">
+          <span class="computed-cost" data-entry-cost="${catId}|${comp.id}|${i}">${fmt(annual)}${t("unit_per_year")}</span>
+          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="${t('remove_btn_title')}">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
         </div>`;
     } else if(comp.type === "currency"){
-      const placeholder = comp.id === "inputs" ? `Descripci\u00f3n (ej. ${ex.input})` : "Descripci\u00f3n del costo";
+      const placeholder = comp.id === "inputs" ? `${t('ph_description_generic')} (e.g. ${ex.input})` : t('ph_cost_generic');
       return `
         <div class="entry-row">
           <input type="text" placeholder="${placeholder}" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
           <input type="number" step="any" min="0" placeholder="0.00 MC" data-path="categories.${catId}.global.${comp.id}.${i}.value" value="${entry.value || ''}">
-          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="Eliminar">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
+          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="${t('remove_btn_title')}">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
         </div>`;
     } else if(comp.hasContractOption){
       const isLumpsum = entry.entryType === "lumpsum";
@@ -766,25 +988,25 @@ function globalComponentHtml(catId, comp, catState){
       return `
         <div class="entry-row">
           <div class="entry-type-toggle" data-entry-type-toggle="${catId}|${comp.id}|${i}">
-            <button type="button" class="${!isLumpsum ? 'active' : ''}" data-entry-type="days">Jornal</button>
-            <button type="button" class="${isLumpsum ? 'active' : ''}" data-entry-type="lumpsum">Contrato</button>
+            <button type="button" class="${!isLumpsum ? 'active' : ''}" data-entry-type="days">${t('entrytype_days')}</button>
+            <button type="button" class="${isLumpsum ? 'active' : ''}" data-entry-type="lumpsum">${t('entrytype_lumpsum')}</button>
           </div>
-          <input type="text" placeholder="Descripci\u00f3n (ej. ${ex.labour})" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
+          <input type="text" placeholder="${t('ph_description_generic')} (e.g. ${ex.labour})" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
           ${isLumpsum
-            ? `<input type="number" step="any" min="0" placeholder="monto fijo MC" data-path="categories.${catId}.global.${comp.id}.${i}.value" value="${entry.value || ''}">`
-            : `<input type="number" step="any" min="0" placeholder="d\u00edas" data-path="categories.${catId}.global.${comp.id}.${i}.days" value="${entry.days || ''}">`
+            ? `<input type="number" step="any" min="0" placeholder="${t('ph_fixed_amount')}" data-path="categories.${catId}.global.${comp.id}.${i}.value" value="${entry.value || ''}">`
+            : `<input type="number" step="any" min="0" placeholder="${t('ph_days')}" data-path="categories.${catId}.global.${comp.id}.${i}.days" value="${entry.days || ''}">`
           }
           <span class="computed-cost" data-entry-cost="${catId}|${comp.id}|${i}">${fmt(entryCost)}</span>
-          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="Eliminar">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
+          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="${t('remove_btn_title')}">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
         </div>`;
     } else {
       const entryCost = comp.costed ? num(entry.days) * wage() : null;
       return `
         <div class="entry-row">
-          <input type="text" placeholder="Descripci\u00f3n (ej. ${ex.labour})" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
-          <input type="number" step="any" min="0" placeholder="d\u00edas" data-path="categories.${catId}.global.${comp.id}.${i}.days" value="${entry.days || ''}">
+          <input type="text" placeholder="${t('ph_description_generic')} (e.g. ${ex.labour})" data-path="categories.${catId}.global.${comp.id}.${i}.label" value="${entry.label || ''}">
+          <input type="number" step="any" min="0" placeholder="${t('ph_days')}" data-path="categories.${catId}.global.${comp.id}.${i}.days" value="${entry.days || ''}">
           ${comp.costed ? `<span class="computed-cost" data-entry-cost="${catId}|${comp.id}|${i}">${fmt(entryCost)}</span>` : ''}
-          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="Eliminar">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
+          ${entries.length > 1 ? `<button type="button" class="remove-btn" data-remove-entry="${catId}|${comp.id}" data-index="${i}" title="${t('remove_btn_title')}">&times;</button>` : `<span style="width:22px;display:inline-block;"></span>`}
         </div>`;
     }
   }).join("");
@@ -792,11 +1014,11 @@ function globalComponentHtml(catId, comp, catState){
   return `
     <div class="component-block ${comp.type === 'days' && !comp.costed ? 'not-costed' : ''}" data-component="${comp.id}">
       <div class="component-block-head">
-        <span class="c-name">${comp.label}${hintHtml}</span>
+        <span class="c-name">${t(comp.labelKey)}${hintHtml}</span>
         <span class="c-subtotal" data-component-subtotal="${catId}|${comp.id}">${subtotalHtml}</span>
       </div>
       ${rowsHtml}
-      <button type="button" class="add-entry-btn" data-add-entry="${catId}|${comp.id}">+ Agregar ${comp.label.toLowerCase()}</button>
+      <button type="button" class="add-entry-btn" data-add-entry="${catId}|${comp.id}">${t("add_entry_prefix")} ${t(comp.labelKey).toLowerCase()}</button>
     </div>`;
 }
 
@@ -809,7 +1031,7 @@ function activityComponentFieldsHtml(catId, activityIndex, values){
   const gridComps = comps.filter(c => !c.hasContractOption && !c.hasDepreciation);
 
   const gridHtml = gridComps.map(c => {
-    const suffix = c.type === "days" ? " (d\u00edas/ha)" : " (MC/ha)";
+    const suffix = c.type === "days" ? ` (${t("ph_days")}${t("unit_per_ha")})` : ` (${t("unit_per_ha")})`;
     return `
       <div class="field">
         <label>${c.label}${suffix}</label>
@@ -827,18 +1049,18 @@ function activityComponentFieldsHtml(catId, activityIndex, values){
     hiredHtml = `
       <div class="activity-hired-block">
         <div class="ahb-head">
-          <span class="c-name">${hiredComp.label} <span class="c-hint">(ej. ${ex.labour})</span></span>
+          <span class="c-name">${t(hiredComp.labelKey)} <span class="c-hint">(e.g. ${ex.labour})</span></span>
           <span class="entry-type-toggle" data-entry-type-toggle-activity="${catId}|${activityIndex}|${hiredComp.id}">
-            <button type="button" class="${!isLumpsum ? 'active' : ''}" data-entry-type="days">Jornal</button>
-            <button type="button" class="${isLumpsum ? 'active' : ''}" data-entry-type="lumpsum">Contrato</button>
+            <button type="button" class="${!isLumpsum ? 'active' : ''}" data-entry-type="days">${t('entrytype_days')}</button>
+            <button type="button" class="${isLumpsum ? 'active' : ''}" data-entry-type="lumpsum">${t('entrytype_lumpsum')}</button>
           </span>
         </div>
         <div class="ahb-row">
           ${isLumpsum
-            ? `<input type="number" step="any" min="0" placeholder="monto fijo MC/ha" data-path="${basePath}.value" value="${entry.value || ''}">`
-            : `<input type="number" step="any" min="0" placeholder="d\u00edas/ha" data-path="${basePath}.days" value="${entry.days || ''}">`
+            ? `<input type="number" step="any" min="0" placeholder="${t('ph_fixed_amount')} ${t('unit_per_ha')}" data-path="${basePath}.value" value="${entry.value || ''}">`
+            : `<input type="number" step="any" min="0" placeholder="${t('ph_days')}${t('unit_per_ha')}" data-path="${basePath}.days" value="${entry.days || ''}">`
           }
-          <span class="computed-cost" data-activity-cost="${catId}|${activityIndex}|${hiredComp.id}">${fmt(entryCost)} MC/ha</span>
+          <span class="computed-cost" data-activity-cost="${catId}|${activityIndex}|${hiredComp.id}">${fmt(entryCost)} ${t("unit_per_ha")}</span>
         </div>
       </div>`;
   }
@@ -851,12 +1073,12 @@ function activityComponentFieldsHtml(catId, activityIndex, values){
     fixedHtml = `
       <div class="activity-hired-block">
         <div class="ahb-head">
-          <span class="c-name">${fixedComp.label} <span class="c-hint">(costo compra \u00f7 vida \u00fatil)</span></span>
+          <span class="c-name">${t(fixedComp.labelKey)} <span class="c-hint">(${t("comp_fixed_hint")})</span></span>
         </div>
         <div class="ahb-row">
-          <input type="number" step="any" min="0" placeholder="costo compra MC" data-path="${basePath}.purchaseCost" value="${entry.purchaseCost || ''}">
-          <input type="number" step="any" min="1" placeholder="vida \u00fatil (a\u00f1os)" data-path="${basePath}.usefulLife" value="${entry.usefulLife || ''}">
-          <span class="computed-cost" data-activity-cost="${catId}|${activityIndex}|${fixedComp.id}">${fmt(annual)}/a\u00f1o</span>
+          <input type="number" step="any" min="0" placeholder="${t('ph_purchase_cost')}" data-path="${basePath}.purchaseCost" value="${entry.purchaseCost || ''}">
+          <input type="number" step="any" min="1" placeholder="${t('ph_useful_life')}" data-path="${basePath}.usefulLife" value="${entry.usefulLife || ''}">
+          <span class="computed-cost" data-activity-cost="${catId}|${activityIndex}|${fixedComp.id}">${fmt(annual)}${t("unit_per_year")}</span>
         </div>
       </div>`;
   }
@@ -869,7 +1091,7 @@ function renderCategories(){
   const cats = visibleCategories();
 
   if(!cats.length){
-    container.innerHTML = `<div class="empty-state">Ninguna actividad seleccionada todav\u00eda. <a data-go-to-activities>Ve a la pesta\u00f1a 1 para seleccionar las actividades de la finca.</a></div>`;
+    container.innerHTML = `<div class="empty-state">${t("empty_categories")} <a data-go-to-activities>${t("empty_categories_link")}</a></div>`;
     const link = container.querySelector("[data-go-to-activities]");
     if(link) link.addEventListener("click", () => switchTab("activities"));
     return;
@@ -884,11 +1106,11 @@ function renderCategories(){
     return `
     <div class="category" data-cat="${cat.id}">
       <div class="cat-head ${cs.open ? 'open' : ''}" data-toggle-open="${cat.id}">
-        <span class="name"><span class="chevron">&#9656;</span>&nbsp; ${cat.label}</span>
+        <span class="name"><span class="chevron">&#9656;</span>&nbsp; ${t(cat.labelKey)}</span>
         <div class="cat-right">
           <div class="toggle-group" data-mode-toggle="${cat.id}">
-            <button type="button" class="${globalActive ? 'active' : ''}" data-mode="global">Entrada Global</button>
-            <button type="button" class="${!globalActive ? 'active' : ''}" data-mode="activity">Por actividad</button>
+            <button type="button" class="${globalActive ? 'active' : ''}" data-mode="global">${t('mode_global')}</button>
+            <button type="button" class="${!globalActive ? 'active' : ''}" data-mode="activity">${t('mode_activity')}</button>
           </div>
           <span class="cat-total">${fmt(total)}</span>
         </div>
@@ -901,19 +1123,19 @@ function renderCategories(){
             ${cs.activities.map((act, i) => `
               <div class="activity-row" data-activity-index="${i}">
                 <div class="activity-top">
-                  <input type="text" placeholder="Nombre de la actividad (ej. ${categoryExamples(cat.id).activity})"
+                  <input type="text" placeholder="${t('ph_activity_name')} ${categoryExamples(cat.id).activity})"
                     data-path="categories.${cat.id}.activities.${i}.name" value="${act.name || ''}">
-                  ${cs.activities.length > 1 ? `<button type="button" class="activity-remove" data-remove-activity="${cat.id}" data-index="${i}">Eliminar</button>` : ''}
+                  ${cs.activities.length > 1 ? `<button type="button" class="activity-remove" data-remove-activity="${cat.id}" data-index="${i}">${t('remove_btn_title')}</button>` : ''}
                 </div>
                 ${activityComponentFieldsHtml(cat.id, i, act)}
               </div>
             `).join("")}
           </div>
-          <button type="button" class="add-activity-btn" data-add-activity="${cat.id}">+ Agregar actividad</button>
+          <button type="button" class="add-activity-btn" data-add-activity="${cat.id}">${t("add_activity_btn")}</button>
         `}
         <div class="subtotal-line">
-          Subtotal ${cat.label}: <strong data-cat-subtotal="${cat.id}">${fmt(total)}</strong> MC / unidad de \u00e1rea
-          <span class="note" data-cat-note="${cat.id}">MO familiar: ${fmtDays(hhDays)} d\u00edas &nbsp;&middot;&nbsp; MO contratada: ${fmtDays(hiredDays)} d\u00edas (jornal ${fmt(wage())} MC/d\u00eda)</span>
+          ${t("subtotal_prefix")} ${t(cat.labelKey)}: <strong data-cat-subtotal="${cat.id}">${fmt(total)}</strong> ${t("subtotal_unit")}
+          <span class="note" data-cat-note="${cat.id}">${t("subtotal_note")} ${fmtDays(hhDays)} ${t("subtotal_note_mid")} ${fmtDays(hiredDays)} ${t("subtotal_note_wage")} ${fmt(wage())})</span>
         </div>
       </div>
     </div>`;
@@ -1055,7 +1277,7 @@ function updateTotalsOnly(){
     const subEl = document.querySelector(`[data-cat-subtotal="${cat.id}"]`);
     if(subEl) subEl.textContent = fmt(total);
     const noteEl = document.querySelector(`[data-cat-note="${cat.id}"]`);
-    if(noteEl) noteEl.textContent = `MO familiar: ${fmtDays(hhDays)} d\u00edas  \u00b7  MO contratada: ${fmtDays(hiredDays)} d\u00edas (jornal ${fmt(wage())} MC/d\u00eda)`;
+    if(noteEl) noteEl.textContent = `${t("subtotal_note")} ${fmtDays(hhDays)} ${t("subtotal_note_mid")} ${fmtDays(hiredDays)} ${t("subtotal_note_wage")} ${fmt(wage())})`;
 
     if(cs.mode === "global"){
       COMPONENTS.forEach(comp => {
@@ -1096,7 +1318,7 @@ function updateTotalsOnly(){
         if(hiredComp){
           const entry = act[hiredComp.id] || {};
           const el = document.querySelector(`[data-activity-cost="${cat.id}|${i}|${hiredComp.id}"]`);
-          if(el) el.textContent = `Costo: ${fmt(entry.entryType === "lumpsum" ? num(entry.value) : num(entry.days) * wage())} MC/ha`;
+          if(el) el.textContent = `${t("cost_colon")} ${fmt(entry.entryType === "lumpsum" ? num(entry.value) : num(entry.days) * wage())} ${t("unit_per_ha")}`;
         }
         const fixedComp = COMPONENTS.find(c => c.hasDepreciation);
         if(fixedComp){
@@ -1108,11 +1330,11 @@ function updateTotalsOnly(){
     }
   });
 
-  document.getElementById("totalCosp").innerHTML = fmt(grand) + " <small>MC/unidad</small>";
+  document.getElementById("totalCosp").innerHTML = fmt(grand) + ` <small>${t("kpi_total_unit")}</small>`;
   document.getElementById("totalInputs").textContent = fmt(grandComponents.inputs);
-  document.getElementById("totalHouseholdDays").innerHTML = fmtDays(hhDaysGrand) + " <small>d\u00edas</small>";
+  document.getElementById("totalHouseholdDays").innerHTML = fmtDays(hhDaysGrand) + ` <small>${t("ph_days")}</small>`;
   document.getElementById("totalHired").textContent = fmt(grandComponents.hired);
-  document.getElementById("totalHiredDays").innerHTML = fmtDays(hiredDaysGrand) + " <small>d\u00edas</small>";
+  document.getElementById("totalHiredDays").innerHTML = fmtDays(hiredDaysGrand) + ` <small>${t("ph_days")}</small>`;
   document.getElementById("totalVariable").textContent = fmt(grandComponents.variable);
   document.getElementById("totalFixed").textContent = fmt(grandComponents.fixed);
 
@@ -1129,11 +1351,11 @@ function renderSummaryTable(){
     const hh = categoryHouseholdDays(cs);
     const hd = categoryHiredDays(cs);
     grand += total; hhGrand += hh; hiredGrand += hd;
-    const modeLabel = cs.mode === "global" ? "Entrada Global" : "Por actividad";
-    return `<tr><td>${cat.label}</td><td>${modeLabel}</td><td class="num">${fmtDays(hh)}</td><td class="num">${fmtDays(hd)}</td><td class="num">${fmt(total)}</td><td class="num">${fmtPrice(pricePerKgPresentation(total))}</td><td class="num">${fmtPrice(pricePerKgGbe(total))}</td></tr>`;
+    const modeLabel = cs.mode === "global" ? t('mode_global') : t('mode_activity');
+    return `<tr><td>${t(cat.labelKey)}</td><td>${modeLabel}</td><td class="num">${fmtDays(hh)}</td><td class="num">${fmtDays(hd)}</td><td class="num">${fmt(total)}</td><td class="num">${fmtPrice(pricePerKgPresentation(total))}</td><td class="num">${fmtPrice(pricePerKgGbe(total))}</td></tr>`;
   }).join("");
-  tbody.innerHTML = (rows || `<tr><td colspan="7" style="color:#9CA399;">Ninguna categor\u00eda seleccionada.</td></tr>`)
-    + `<tr class="total-row"><td>Total CPS</td><td></td><td class="num">${fmtDays(hhGrand)}</td><td class="num">${fmtDays(hiredGrand)}</td><td class="num">${fmt(grand)}</td><td class="num">${fmtPrice(pricePerKgPresentation(grand))}</td><td class="num">${fmtPrice(pricePerKgGbe(grand))}</td></tr>`;
+  tbody.innerHTML = (rows || `<tr><td colspan="7" style="color:#9CA399;">${t("empty_summary")}</td></tr>`)
+    + `<tr class="total-row"><td>${t("total_cps_row")}</td><td></td><td class="num">${fmtDays(hhGrand)}</td><td class="num">${fmtDays(hiredGrand)}</td><td class="num">${fmt(grand)}</td><td class="num">${fmtPrice(pricePerKgPresentation(grand))}</td><td class="num">${fmtPrice(pricePerKgGbe(grand))}</td></tr>`;
 }
 
 function renderQuestionnaireTab(){
@@ -1152,6 +1374,39 @@ function switchTab(tab){
   document.getElementById("tabBtnQuestionnaire").classList.toggle("active", tab === "questionnaire");
 }
 
+// ---------------- Language ----------------
+
+function applyStaticTranslations(){
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    // Only replace this node's own text, not any nested elements (e.g. the logo's <span>,
+    // or KPI cards whose value is filled in separately by updateTotalsOnly).
+    const directTextNode = [...el.childNodes].find(n => n.nodeType === 3);
+    if(directTextNode){
+      directTextNode.textContent = t(key);
+    } else if(!el.children.length){
+      el.textContent = t(key);
+    }
+  });
+  document.title = t("app_title") + " \u2014 " + t("app_subtitle");
+}
+
+function setLanguage(lang){
+  state.lang = lang;
+  saveState();
+  document.querySelectorAll("#langToggle button").forEach(b => b.classList.toggle("active", b.getAttribute("data-lang") === lang));
+  applyStaticTranslations();
+  presentationSelect.innerHTML = PRESENTATIONS.map(p => `<option value="${p.value}">${t(p.labelKey)}</option>`).join("");
+  presentationSelect.value = state.presentation || "cherry";
+  updateYieldGbeDisplay();
+  renderActivitiesTab();
+  renderQuestionnaireTab();
+}
+
+document.querySelectorAll("#langToggle button").forEach(btn => {
+  btn.addEventListener("click", () => setLanguage(btn.getAttribute("data-lang")));
+});
+
 document.getElementById("tabBtnActivities").addEventListener("click", () => switchTab("activities"));
 document.getElementById("tabBtnQuestionnaire").addEventListener("click", () => switchTab("questionnaire"));
 document.getElementById("continueToQuestionnaire").addEventListener("click", () => switchTab("questionnaire"));
@@ -1160,11 +1415,15 @@ document.getElementById("editActivitiesLink").addEventListener("click", () => sw
 // ---------------- Setup fields ----------------
 
 document.getElementById("fgdName").addEventListener("input", (e) => { state.fgdName = e.target.value; saveState(); });
+document.getElementById("floId").addEventListener("input", (e) => { state.floId = e.target.value; saveState(); });
+document.getElementById("coopName").addEventListener("input", (e) => { state.coopName = e.target.value; saveState(); });
 document.getElementById("areaUnit").addEventListener("change", (e) => { state.areaUnit = e.target.value; saveState(); });
 document.getElementById("currency").addEventListener("input", (e) => { state.currency = e.target.value; saveState(); });
 document.getElementById("dailyWage").addEventListener("input", (e) => { state.dailyWage = e.target.value; saveState(); updateTotalsOnly(); });
 
 document.getElementById("fgdName").value = state.fgdName || "";
+document.getElementById("floId").value = state.floId || "";
+document.getElementById("coopName").value = state.coopName || "";
 document.getElementById("areaUnit").value = state.areaUnit || "ha";
 document.getElementById("currency").value = state.currency || "";
 document.getElementById("dailyWage").value = state.dailyWage || "";
@@ -1173,11 +1432,11 @@ document.getElementById("dailyWage").value = state.dailyWage || "";
 
 function updateYieldGbeDisplay(){
   const y = yieldGbePerHa();
-  document.getElementById("yieldGbeDisplay").value = (y > 0 ? fmtDays(y) : "0.0") + " kg GBE/ha";
+  document.getElementById("yieldGbeDisplay").value = (y > 0 ? fmtDays(y) : "0.0") + " " + t("yield_gbe_suffix");
 }
 
 const presentationSelect = document.getElementById("presentationSelect");
-presentationSelect.innerHTML = PRESENTATIONS.map(p => `<option value="${p.value}">${p.label}</option>`).join("");
+presentationSelect.innerHTML = PRESENTATIONS.map(p => `<option value="${p.value}">${t(p.labelKey)}</option>`).join("");
 presentationSelect.value = state.presentation || "cherry";
 presentationSelect.addEventListener("change", (e) => {
   state.presentation = e.target.value;
@@ -1210,10 +1469,14 @@ updateYieldGbeDisplay();
 // ---------------- Bottom actions ----------------
 
 document.getElementById("resetBtn").addEventListener("click", () => {
-  if(confirm("Esto borrar\u00e1 todos los datos capturados en este FGD. \u00bfContinuar?")){
+  if(confirm(t("confirm_reset"))){
+    const keepLang = state.lang;
     state = defaultState();
+    state.lang = keepLang;
     saveState();
     document.getElementById("fgdName").value = "";
+    document.getElementById("floId").value = "";
+    document.getElementById("coopName").value = "";
     document.getElementById("currency").value = "";
     document.getElementById("dailyWage").value = "";
     presentationSelect.value = state.presentation;
@@ -1231,13 +1494,13 @@ document.getElementById("printBtn").addEventListener("click", () => window.print
 document.getElementById("exportBtn").addEventListener("click", () => {
   // Totals only - no per-line disaggregation, per design: the enumerator who fills this
   // in is also the one who transcribes into SurveyJS, so the export stays at category level.
-  let csv = "Categoria,Modo,Insumos,Dias MO familiar,MO contratada (costo),Dias MO contratada,Costos variables,Costos fijos (anualizado),Total,Precio/kg presentacion,Precio/kg GBE\n";
+  let csv = "Category,Mode,Inputs,Family labour days,Paid labour (cost),Paid labour days,Variable costs,Fixed costs (annualized),Total,Price/kg (coffee type),Price/kg GBE\n";
   let grand = 0;
   visibleCategories().forEach(cat => {
     const cs = state.categories[cat.id];
     const total = categoryTotal(cs);
     grand += total;
-    const modeLabel = cs.mode === "global" ? "Entrada Global" : "Por actividad";
+    const modeLabel = cs.mode === "global" ? t('mode_global') : t('mode_activity');
     const inputsC = componentMonetary(cs, COMPONENTS.find(c=>c.id==='inputs'));
     const hhDays = categoryHouseholdDays(cs);
     const hiredC = componentMonetary(cs, COMPONENTS.find(c=>c.id==='hired'));
@@ -1246,13 +1509,13 @@ document.getElementById("exportBtn").addEventListener("click", () => {
     const fixedC = componentMonetary(cs, COMPONENTS.find(c=>c.id==='fixed'));
     const priceP = pricePerKgPresentation(total);
     const priceG = pricePerKgGbe(total);
-    csv += `"${cat.label}","${modeLabel}",${inputsC},${hhDays},${hiredC},${hiredDays},${variableC},${fixedC},${total},${priceP === null ? '' : priceP},${priceG === null ? '' : priceG}\n`;
+    csv += `"${t(cat.labelKey)}","${modeLabel}",${inputsC},${hhDays},${hiredC},${hiredDays},${variableC},${fixedC},${total},${priceP === null ? '' : priceP},${priceG === null ? '' : priceG}\n`;
   });
   const grandPriceP = pricePerKgPresentation(grand);
   const grandPriceG = pricePerKgGbe(grand);
   csv += `"TOTAL CPS","",,,,,,,${grand},${grandPriceP === null ? '' : grandPriceP},${grandPriceG === null ? '' : grandPriceG}\n`;
-  csv += `\nFGD,${state.fgdName || ''}\nUnidad de area,${state.areaUnit || ''}\nMoneda,${state.currency || ''}\nJornal diario,${state.dailyWage || ''}\n`;
-  csv += `Presentacion,${presentationLabel(state.presentation)}\nRatio conversion GBE (kg presentacion por 1 kg GBE),${state.gbeRatio || ''}\nRendimiento (kg/ha presentacion),${state.yieldPerHa || ''}\n`;
+  csv += `\nFGD,${state.fgdName || ''}\nFLO-ID,${state.floId || ''}\nCooperative,${state.coopName || ''}\nArea unit,${state.areaUnit || ''}\nCurrency,${state.currency || ''}\nDaily wage,${state.dailyWage || ''}\n`;
+  csv += `Coffee type,${presentationLabel(state.presentation)}\nGBE conversion ratio (kg of type per 1 kg GBE),${state.gbeRatio || ''}\nYield (kg/ha, in that type),${state.yieldPerHa || ''}\n`;
 
   const safeName = (state.fgdName || "fgd_cosp").replace(/[^a-z0-9_-]/gi, "_");
   downloadFile(`resumen_cps_${safeName}.csv`, "text/csv", csv);
@@ -1264,7 +1527,7 @@ document.getElementById("saveJsonBtn").addEventListener("click", () => {
   const safeName = (state.fgdName || "fgd_cosp").replace(/[^a-z0-9_-]/gi, "_");
   const dateStr = new Date().toISOString().slice(0,10);
   downloadFile(`datos_cps_${safeName}_${dateStr}.json`, "application/json", JSON.stringify(state, null, 2));
-  document.getElementById("saveStatus").textContent = "Datos JSON descargados " + new Date().toLocaleTimeString();
+  document.getElementById("saveStatus").textContent = t("save_status_json") + " " + new Date().toLocaleTimeString();
 });
 
 document.getElementById("loadJsonBtn").addEventListener("click", () => {
@@ -1280,20 +1543,25 @@ document.getElementById("loadJsonFile").addEventListener("change", (e) => {
     try{
       parsed = JSON.parse(evt.target.result);
     }catch(err){
-      alert("Este archivo no es un JSON v\u00e1lido de la calculadora. No se cargaron datos.");
+      alert(t("alert_json_invalid"));
       e.target.value = "";
       return;
     }
-    if(!confirm("Esto reemplazar\u00e1 los datos que est\u00e1n en pantalla ahora mismo con los del archivo \"" + file.name + "\". \u00bfContinuar?")){
+    if(!confirm(t("confirm_json_load").replace("FILENAME", file.name))){
       e.target.value = "";
       return;
     }
     state = sanitizeState(parsed);
     saveState();
+    document.querySelectorAll("#langToggle button").forEach(b => b.classList.toggle("active", b.getAttribute("data-lang") === (state.lang || "en")));
+    applyStaticTranslations();
+    presentationSelect.innerHTML = PRESENTATIONS.map(p => `<option value="${p.value}">${t(p.labelKey)}</option>`).join("");
     presentationSelect.value = state.presentation || "cherry";
     document.getElementById("gbeRatioInput").value = state.gbeRatio || "";
     document.getElementById("yieldPerHaInput").value = state.yieldPerHa || "";
     document.getElementById("fgdName").value = state.fgdName || "";
+    document.getElementById("floId").value = state.floId || "";
+    document.getElementById("coopName").value = state.coopName || "";
     document.getElementById("areaUnit").value = state.areaUnit || "ha";
     document.getElementById("currency").value = state.currency || "";
     document.getElementById("dailyWage").value = state.dailyWage || "";
@@ -1339,11 +1607,13 @@ document.getElementById("saveHtmlBtn").addEventListener("click", () => {
   const dateStr = new Date().toISOString().slice(0,10);
   downloadFile(`calculadora_cps_${safeName}_${dateStr}.html`, "text/html", htmlString);
 
-  document.getElementById("saveStatus").textContent = "Copia HTML descargada " + new Date().toLocaleTimeString();
+  document.getElementById("saveStatus").textContent = t("save_status_html") + " " + new Date().toLocaleTimeString();
 });
 
 // ---------------- Init ----------------
 
+document.querySelectorAll("#langToggle button").forEach(b => b.classList.toggle("active", b.getAttribute("data-lang") === (state.lang || "en")));
+applyStaticTranslations();
 renderActivitiesTab();
 renderQuestionnaireTab();
 switchTab(state.activeTab === "questionnaire" ? "questionnaire" : "activities");
