@@ -198,7 +198,7 @@
   <div class="left">
     <div class="logo">Calculadora CPS <span>Captura en FGD</span></div>
   </div>
-  <div class="badge">Herramienta temporal</div>
+  <div class="badge">Herramienta temporal — sin conexi&oacute;n a SurveyJS</div>
 </header>
 
 <div id="dashboard">
@@ -306,6 +306,9 @@
     <div id="categoriesContainer"></div>
 
     <div class="bottom-actions">
+      <button class="btn btn-save" id="saveJsonBtn">Guardar datos (JSON)</button>
+      <button class="btn btn-outline" id="loadJsonBtn">Cargar datos (JSON)</button>
+      <input type="file" id="loadJsonFile" accept="application/json,.json" style="display:none;">
       <button class="btn btn-save" id="saveHtmlBtn">Guardar copia HTML</button>
       <button class="btn btn-primary" id="exportBtn">Exportar resumen (CSV)</button>
       <button class="btn btn-outline" id="printBtn">Imprimir / Guardar PDF</button>
@@ -1253,6 +1256,54 @@ document.getElementById("exportBtn").addEventListener("click", () => {
 
   const safeName = (state.fgdName || "fgd_cosp").replace(/[^a-z0-9_-]/gi, "_");
   downloadFile(`resumen_cps_${safeName}.csv`, "text/csv", csv);
+});
+
+document.getElementById("saveJsonBtn").addEventListener("click", () => {
+  // A lighter-weight alternative to the full HTML snapshot: just the data, easy to email
+  // back to whoever is compiling results from several enumerators.
+  const safeName = (state.fgdName || "fgd_cosp").replace(/[^a-z0-9_-]/gi, "_");
+  const dateStr = new Date().toISOString().slice(0,10);
+  downloadFile(`datos_cps_${safeName}_${dateStr}.json`, "application/json", JSON.stringify(state, null, 2));
+  document.getElementById("saveStatus").textContent = "Datos JSON descargados " + new Date().toLocaleTimeString();
+});
+
+document.getElementById("loadJsonBtn").addEventListener("click", () => {
+  document.getElementById("loadJsonFile").click();
+});
+
+document.getElementById("loadJsonFile").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    let parsed;
+    try{
+      parsed = JSON.parse(evt.target.result);
+    }catch(err){
+      alert("Este archivo no es un JSON v\u00e1lido de la calculadora. No se cargaron datos.");
+      e.target.value = "";
+      return;
+    }
+    if(!confirm("Esto reemplazar\u00e1 los datos que est\u00e1n en pantalla ahora mismo con los del archivo \"" + file.name + "\". \u00bfContinuar?")){
+      e.target.value = "";
+      return;
+    }
+    state = sanitizeState(parsed);
+    saveState();
+    presentationSelect.value = state.presentation || "cherry";
+    document.getElementById("gbeRatioInput").value = state.gbeRatio || "";
+    document.getElementById("yieldPerHaInput").value = state.yieldPerHa || "";
+    document.getElementById("fgdName").value = state.fgdName || "";
+    document.getElementById("areaUnit").value = state.areaUnit || "ha";
+    document.getElementById("currency").value = state.currency || "";
+    document.getElementById("dailyWage").value = state.dailyWage || "";
+    updateYieldGbeDisplay();
+    renderActivitiesTab();
+    renderQuestionnaireTab();
+    switchTab("questionnaire");
+    e.target.value = "";
+  };
+  reader.readAsText(file);
 });
 
 document.getElementById("saveHtmlBtn").addEventListener("click", () => {
