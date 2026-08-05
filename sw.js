@@ -4,7 +4,7 @@
 // fully offline after the first successful load. Bump CACHE_NAME whenever index.html changes,
 // so returning visitors get the new version instead of a stale cached one.
 
-const CACHE_NAME = "cosp-fgd-shell-v4";
+const CACHE_NAME = "cosp-fgd-shell-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
