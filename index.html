@@ -218,6 +218,12 @@
   .records-empty h2 { color: var(--night); font-family: 'Exo 2', sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
   .records-empty p { color: var(--text-light); font-size: .88rem; margin-bottom: 18px; }
 
+  .filter-bar { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(30,30,30,.08); padding: 14px 18px; margin-bottom: 14px; }
+  .filter-bar select { min-width: 150px; }
+  .filter-bar .filter-reset { align-self: flex-end; }
+
   .warn-note { background: var(--tangerine-tint); border-left: 4px solid var(--tangerine);
     padding: 10px 16px; font-size: .8rem; color: #8a4500; margin-bottom: 14px; border-radius: 0 8px 8px 0; }
 
@@ -245,6 +251,9 @@
     .top-actions .spacer { display: none; }
     .save-status { flex: 1 1 100%; }
     .table-card { padding: 14px; }
+    .filter-bar { padding: 12px; gap: 10px; }
+    .filter-bar .field { flex: 1 1 140px; }
+    .filter-bar select { min-width: 0; width: 100%; }
     .record-card-actions .btn { flex: 1 1 auto; }
 
     table.dt thead { display: none; }
@@ -308,9 +317,22 @@
 
   <!-- ============ Screen A: list of FGDs stored on this device ============ -->
   <div class="screen" id="screenList">
-    <div class="section-title"><span data-i18n="records_heading">FGDs on this device</span></div>
-    <div class="notice" data-i18n="records_help"></div>
-    <div id="recordsListContainer"></div>
+
+    <div class="tab-bar">
+      <button type="button" class="tab-btn" id="listTabRecords" data-i18n="tab_list_records">My FGDs</button>
+      <button type="button" class="tab-btn" id="listTabCompare" data-i18n="tab_list_compare">Compare FGDs</button>
+    </div>
+
+    <div class="tab-panel" id="listPanelRecords">
+      <div class="notice" data-i18n="records_help"></div>
+      <div id="recordsListContainer"></div>
+    </div>
+
+    <div class="tab-panel" id="listPanelCompare">
+      <div class="notice" data-i18n="compare_help"></div>
+      <div id="compareContainer"></div>
+    </div>
+
   </div>
 
   <!-- ============ Screen B: one FGD open for editing ============ -->
@@ -340,6 +362,10 @@
           <option value="otro" data-i18n="area_unit_other">Other</option>
         </select>
       </div>
+      <div class="field" id="areaUnitOtherField" style="display:none;">
+        <label data-i18n="field_area_unit_other_name">Name of that unit</label>
+        <input type="text" id="areaUnitOther" placeholder="e.g. cuerda, tarea" style="min-width:150px">
+      </div>
       <div class="field">
         <label data-i18n="field_currency">Local currency</label>
         <input type="text" id="currency" placeholder="e.g. PEN, COP, GTQ" style="min-width:110px">
@@ -353,7 +379,6 @@
     <div class="tab-bar">
       <button type="button" class="tab-btn" id="tabBtnActivities" data-tab="activities"><span class="step-num">1</span><span data-i18n="tab1_label">Farm activities</span></button>
       <button type="button" class="tab-btn" id="tabBtnQuestionnaire" data-tab="questionnaire"><span class="step-num">2</span><span data-i18n="tab2_label">Cost questionnaire</span></button>
-      <button type="button" class="tab-btn" id="tabBtnCompare" data-tab="compare"><span class="step-num">3</span><span data-i18n="tab3_label">Compare FGDs</span></button>
     </div>
 
     <div class="tab-panel" id="tabPanelActivities">
@@ -370,7 +395,7 @@
             <input type="number" step="any" min="0" id="gbeRatioInput" placeholder="e.g. 5.00">
           </div>
           <div class="field">
-            <label data-i18n="field_yield">Real yield (kg/ha, in that type)</label>
+            <label data-i18n-unit="field_yield">Real yield (kg per area unit, in that type)</label>
             <input type="number" step="any" min="0" id="yieldPerHaInput" placeholder="0.00">
           </div>
           <div class="field">
@@ -434,7 +459,7 @@
               <th data-i18n="th_mode">Entry mode</th>
               <th class="num" data-i18n="th_hh_days">Family labour days</th>
               <th class="num" data-i18n="th_hired_days">Paid labour days</th>
-              <th class="num" data-i18n="th_total">Total (currency/area unit)</th>
+              <th class="num" data-i18n-unit="th_total">Total (currency/area unit)</th>
               <th class="num" data-i18n="th_price_pres">Price/kg (coffee type)</th>
               <th class="num" data-i18n="th_price_gbe">Price/kg GBE</th>
             </tr>
@@ -443,12 +468,6 @@
         </table>
       </div>
 
-    </div>
-
-    <div class="tab-panel" id="tabPanelCompare">
-      <div class="section-title"><span data-i18n="compare_title">Comparison across FGDs</span></div>
-      <div class="notice" data-i18n="compare_help"></div>
-      <div id="compareContainer"></div>
     </div>
 
   </div>
@@ -477,15 +496,17 @@ const TRANSLATIONS = {
     lang_switch_label: "Language:",
     field_fgd_name: "FGD name or code", field_flo_id: "FLO-ID", field_coop_name: "Cooperative name",
     field_area_unit: "Area unit", area_unit_ha: "Hectare (ha)", area_unit_mz: "Manzana", area_unit_acre: "Acre", area_unit_other: "Other",
+    field_area_unit_other_name: "Name of that unit",
+    unit_short_ha: "ha", unit_short_mz: "mz", unit_short_acre: "acre", unit_generic: "area unit", unit_currency_generic: "currency",
     field_currency: "Local currency", field_daily_wage: "Daily wage (currency/day)",
     save_status_auto: "Saved on this device", save_status_blocked: "Cannot save on this device — export your data before closing",
     save_status_json: "JSON file downloaded", save_status_csv: "CSV file downloaded",
-    tab1_label: "Farm activities", tab2_label: "Cost questionnaire", tab3_label: "Compare FGDs",
+    tab1_label: "Farm activities", tab2_label: "Cost questionnaire",
     continue_btn: "Continue to questionnaire →",
     presentation_card_title: "Coffee type and yield",
     presentation_card_desc: "Used to turn the production cost into a price per kg. The GBE conversion ratio (how many kg of this type equal 1 kg GBE) fills in automatically, but you can adjust it.",
     field_presentation: "Coffee type sold", field_gbe_ratio: "Kg of this type = 1 kg GBE",
-    field_yield: "Real yield (kg/ha, in that type)", field_yield_equiv: "Equivalent yield",
+    field_yield: "Real yield (kg/{u}, in that type)", field_yield_equiv: "Equivalent yield",
     presentation_cherry: "Red cherry", presentation_dried_cherry: "Dried cherry", presentation_wet_parchment: "Wet parchment",
     presentation_dry_parchment: "Dry parchment", presentation_green_bean: "Green bean (GBE)",
     activity_group1_title: "1. Crop Establishment", activity_group1_desc: "Activities for starting or renewing coffee plots.",
@@ -516,19 +537,19 @@ const TRANSLATIONS = {
     ph_amount: "amount", ph_days: "days", ph_fixed_amount: "fixed amount", ph_purchase_cost: "purchase cost", ph_useful_life: "useful life (years)",
     ph_activity_name: "Activity name (e.g.", ph_tool_equipment: "Description (e.g. tool or equipment)",
     add_entry_prefix: "+ Add", add_activity_btn: "+ Add activity", remove_btn_title: "Remove",
-    kpi_total: "CPS Total", kpi_total_unit: "currency/unit", kpi_inputs: "Inputs", kpi_household_days: "Family labour days",
+    kpi_total: "CPS Total", kpi_total_unit: "{c}/{u}", kpi_inputs: "Inputs", kpi_household_days: "Family labour days",
     kpi_hired_cost: "Paid labour (cost)", kpi_hired_days: "Paid labour days", kpi_variable: "Variable costs", kpi_fixed: "Fixed costs",
     section_categories: "Cost categories", edit_activities_link: "Edit selected activities",
     empty_categories: "No activities selected yet.", empty_categories_link: "Go to Tab 1 to select the farm's activities.",
     empty_summary: "No category selected.",
-    subtotal_prefix: "Subtotal", subtotal_unit: "currency / area unit",
+    subtotal_prefix: "Subtotal", subtotal_unit: "{c} / {u}",
     subtotal_note: "Family labour:", subtotal_note_mid: "days · Paid labour:", subtotal_note_wage: "days (wage",
     table_title: "Summary by category", table_note: "Totals only — the line-by-line detail stays in the questionnaire, not in this summary.",
     th_category: "Category", th_mode: "Entry mode", th_hh_days: "Family labour days", th_hired_days: "Paid labour days",
-    th_total: "Total (currency/area unit)", th_price_pres: "Price/kg (coffee type)", th_price_gbe: "Price/kg GBE",
+    th_total: "Total ({c}/{u})", th_price_pres: "Price/kg (coffee type)", th_price_gbe: "Price/kg GBE",
     total_cps_row: "Total CPS",
-    yield_gbe_suffix: "kg GBE/ha",
-    unit_per_year: "/year", unit_per_ha: "/ha", cost_colon: "Cost:",
+    yield_gbe_suffix: "kg GBE/{u}",
+    unit_per_year: "/year", unit_per_area: "/{u}", cost_colon: "Cost:",
     // ---- records list ----
     btn_my_records: "My FGDs", btn_new_record: "+ New FGD",
     btn_export_this_json: "Save this FGD (JSON)", btn_export_this_csv: "Export this FGD (CSV)",
@@ -543,13 +564,17 @@ const TRANSLATIONS = {
     untitled_fgd: "FGD without a name", no_coop: "Cooperative not entered",
     col_updated: "Last change", record_open_now: "Open now",
     // ---- compare ----
-    compare_title: "Comparison across FGDs",
-    compare_help: "Every FGD saved on this device, side by side. Averages are only meaningful when the FGDs share the same currency and area unit, so check the currency column before reading them.",
+    tab_list_records: "My FGDs", tab_list_compare: "Compare FGDs",
+    compare_help: "Every FGD saved on this device, side by side. Use the filters to compare like with like: a price per kg of cherry and a price per kg of parchment are not the same thing. The price per kg GBE is the one figure that is comparable across coffee types.",
     compare_need_more: "Save at least two FGDs to compare them.",
-    compare_mixed_currency: "Careful: these FGDs do not all use the same currency or area unit. The average row mixes units and should not be reported as-is.",
+    compare_no_match: "No FGD matches these filters.",
+    compare_mixed_currency: "These FGDs do not all use the same currency or area unit, so the money averages are left blank. Filter by currency and area unit to see them.",
+    compare_mixed_presentation: "These FGDs do not all sell the same coffee type, so the yield and price-per-kg averages are left blank. The price per kg GBE stays comparable. Filter by coffee type to see the rest.",
     compare_avg: "Average",
-    th_fgd: "FGD", th_coop: "Cooperative", th_currency: "Currency", th_wage: "Daily wage",
-    th_type: "Coffee type", th_yield: "Yield (kg/ha)", th_yield_gbe: "Yield (kg GBE/ha)",
+    filter_presentation: "Coffee type", filter_currency: "Currency", filter_area_unit: "Area unit",
+    filter_all: "All", filter_reset: "Clear filters",
+    th_fgd: "FGD", th_coop: "Cooperative", th_currency: "Currency / unit", th_wage: "Daily wage", th_total_compare: "Total CPS",
+    th_type: "Coffee type", th_yield: "Yield", th_yield_gbe: "Yield (GBE)",
     // ---- confirmations ----
     modal_cancel: "Cancel", modal_confirm: "Confirm", modal_delete: "Delete",
     confirm_delete_record: "Delete this FGD and everything entered in it? This cannot be undone.",
@@ -565,15 +590,17 @@ const TRANSLATIONS = {
     lang_switch_label: "Idioma:",
     field_fgd_name: "Nombre o código del FGD", field_flo_id: "FLO-ID", field_coop_name: "Nombre de la cooperativa",
     field_area_unit: "Unidad de área", area_unit_ha: "Hectárea (ha)", area_unit_mz: "Manzana", area_unit_acre: "Acre", area_unit_other: "Otra",
+    field_area_unit_other_name: "Nombre de esa unidad",
+    unit_short_ha: "ha", unit_short_mz: "mz", unit_short_acre: "acre", unit_generic: "unidad", unit_currency_generic: "moneda",
     field_currency: "Moneda local", field_daily_wage: "Jornal diario (moneda/día)",
     save_status_auto: "Guardado en este dispositivo", save_status_blocked: "No se puede guardar en este dispositivo — exporte sus datos antes de cerrar",
     save_status_json: "Archivo JSON descargado", save_status_csv: "Archivo CSV descargado",
-    tab1_label: "Actividades de la finca", tab2_label: "Cuestionario de costos", tab3_label: "Comparar FGD",
+    tab1_label: "Actividades de la finca", tab2_label: "Cuestionario de costos",
     continue_btn: "Continuar al cuestionario →",
     presentation_card_title: "Presentación del café y rendimiento",
     presentation_card_desc: "Se usa para convertir el costo de producción en un precio por kg. El ratio de conversión a GBE (cuántos kg de esta presentación equivalen a 1 kg GBE) se autocompleta, pero puede ajustarlo.",
     field_presentation: "Presentación del café", field_gbe_ratio: "Kg de esta presentación = 1 kg GBE",
-    field_yield: "Rendimiento real (kg/ha en esa presentación)", field_yield_equiv: "Rendimiento equivalente",
+    field_yield: "Rendimiento real (kg/{u} en esa presentación)", field_yield_equiv: "Rendimiento equivalente",
     presentation_cherry: "Cereza roja", presentation_dried_cherry: "Cereza seca", presentation_wet_parchment: "Pergamino húmedo",
     presentation_dry_parchment: "Pergamino seco", presentation_green_bean: "Grano verde (GBE)",
     activity_group1_title: "1. Establecimiento del Cultivo", activity_group1_desc: "Actividades relacionadas con el inicio o la renovación de los lotes de café.",
@@ -604,19 +631,19 @@ const TRANSLATIONS = {
     ph_amount: "monto", ph_days: "días", ph_fixed_amount: "monto fijo", ph_purchase_cost: "costo de compra", ph_useful_life: "vida útil (años)",
     ph_activity_name: "Nombre de la actividad (ej.", ph_tool_equipment: "Descripción (ej. herramienta o equipo)",
     add_entry_prefix: "+ Agregar", add_activity_btn: "+ Agregar actividad", remove_btn_title: "Eliminar",
-    kpi_total: "CPS Total", kpi_total_unit: "moneda/unidad", kpi_inputs: "Insumos", kpi_household_days: "Días MO familiar",
+    kpi_total: "CPS Total", kpi_total_unit: "{c}/{u}", kpi_inputs: "Insumos", kpi_household_days: "Días MO familiar",
     kpi_hired_cost: "MO contratada (costo)", kpi_hired_days: "Días MO contratada", kpi_variable: "Costos variables", kpi_fixed: "Costos fijos",
     section_categories: "Categorías de costo", edit_activities_link: "Editar actividades seleccionadas",
     empty_categories: "Ninguna actividad seleccionada todavía.", empty_categories_link: "Ve a la pestaña 1 para seleccionar las actividades de la finca.",
     empty_summary: "Ninguna categoría seleccionada.",
-    subtotal_prefix: "Subtotal", subtotal_unit: "moneda / unidad de área",
+    subtotal_prefix: "Subtotal", subtotal_unit: "{c} / {u}",
     subtotal_note: "MO familiar:", subtotal_note_mid: "días · MO contratada:", subtotal_note_wage: "días (jornal",
     table_title: "Resumen por categoría", table_note: "Solo totales — el detalle por línea queda en el cuestionario, no en este resumen.",
     th_category: "Categoría", th_mode: "Modo de entrada", th_hh_days: "Días MO familiar", th_hired_days: "Días MO contratada",
-    th_total: "Total (moneda/unidad de área)", th_price_pres: "Precio/kg (presentación)", th_price_gbe: "Precio/kg GBE",
+    th_total: "Total ({c}/{u})", th_price_pres: "Precio/kg (presentación)", th_price_gbe: "Precio/kg GBE",
     total_cps_row: "Total CPS",
-    yield_gbe_suffix: "kg GBE/ha",
-    unit_per_year: "/año", unit_per_ha: "/ha", cost_colon: "Costo:",
+    yield_gbe_suffix: "kg GBE/{u}",
+    unit_per_year: "/año", unit_per_area: "/{u}", cost_colon: "Costo:",
     btn_my_records: "Mis FGD", btn_new_record: "+ Nuevo FGD",
     btn_export_this_json: "Guardar este FGD (JSON)", btn_export_this_csv: "Exportar este FGD (CSV)",
     btn_export_all_csv: "Exportar todos (CSV)", btn_export_all_json: "Respaldar todos (JSON)",
@@ -629,13 +656,17 @@ const TRANSLATIONS = {
     records_empty_body: "Empiecen su primer FGD. Se queda en este dispositivo hasta que lo exporten.",
     untitled_fgd: "FGD sin nombre", no_coop: "Cooperativa sin anotar",
     col_updated: "Último cambio", record_open_now: "Abierto ahora",
-    compare_title: "Comparación entre FGD",
-    compare_help: "Todos los FGD guardados en este dispositivo, uno al lado del otro. Los promedios solo tienen sentido cuando los FGD comparten la misma moneda y unidad de área, así que revisen la columna de moneda antes de leerlos.",
+    tab_list_records: "Mis FGD", tab_list_compare: "Comparar FGD",
+    compare_help: "Todos los FGD guardados en este dispositivo, uno al lado del otro. Usen los filtros para comparar lo comparable: un precio por kg de cereza y uno por kg de pergamino no son lo mismo. El precio por kg GBE es el único que se puede comparar entre presentaciones distintas.",
     compare_need_more: "Guarden al menos dos FGD para poder compararlos.",
-    compare_mixed_currency: "Cuidado: estos FGD no usan todos la misma moneda o unidad de área. La fila de promedio mezcla unidades y no debe reportarse tal cual.",
+    compare_no_match: "Ningún FGD coincide con estos filtros.",
+    compare_mixed_currency: "Estos FGD no usan todos la misma moneda o unidad de área, así que los promedios de dinero se dejan en blanco. Filtren por moneda y unidad de área para verlos.",
+    compare_mixed_presentation: "Estos FGD no venden todos la misma presentación, así que los promedios de rendimiento y de precio por kg se dejan en blanco. El precio por kg GBE sigue siendo comparable. Filtren por presentación para ver el resto.",
     compare_avg: "Promedio",
-    th_fgd: "FGD", th_coop: "Cooperativa", th_currency: "Moneda", th_wage: "Jornal diario",
-    th_type: "Presentación", th_yield: "Rendimiento (kg/ha)", th_yield_gbe: "Rendimiento (kg GBE/ha)",
+    filter_presentation: "Presentación", filter_currency: "Moneda", filter_area_unit: "Unidad de área",
+    filter_all: "Todas", filter_reset: "Quitar filtros",
+    th_fgd: "FGD", th_coop: "Cooperativa", th_currency: "Moneda / unidad", th_wage: "Jornal diario", th_total_compare: "CPS Total",
+    th_type: "Presentación", th_yield: "Rendimiento", th_yield_gbe: "Rendimiento (GBE)",
     modal_cancel: "Cancelar", modal_confirm: "Confirmar", modal_delete: "Borrar",
     confirm_delete_record: "¿Borrar este FGD y todo lo capturado en él? No se puede deshacer.",
     confirm_delete_all: "¿Borrar todos los FGD guardados en este dispositivo? No se puede deshacer. Si no están seguros, hagan primero un respaldo JSON.",
@@ -650,15 +681,17 @@ const TRANSLATIONS = {
     lang_switch_label: "Idioma:",
     field_fgd_name: "Nome ou código do FGD", field_flo_id: "FLO-ID", field_coop_name: "Nome da cooperativa",
     field_area_unit: "Unidade de área", area_unit_ha: "Hectare (ha)", area_unit_mz: "Manzana", area_unit_acre: "Acre", area_unit_other: "Outra",
+    field_area_unit_other_name: "Nome dessa unidade",
+    unit_short_ha: "ha", unit_short_mz: "mz", unit_short_acre: "acre", unit_generic: "unidade", unit_currency_generic: "moeda",
     field_currency: "Moeda local", field_daily_wage: "Diária (moeda/dia)",
     save_status_auto: "Salvo neste dispositivo", save_status_blocked: "Não é possível salvar neste dispositivo — exporte seus dados antes de fechar",
     save_status_json: "Arquivo JSON baixado", save_status_csv: "Arquivo CSV baixado",
-    tab1_label: "Atividades da propriedade", tab2_label: "Questionário de custos", tab3_label: "Comparar FGD",
+    tab1_label: "Atividades da propriedade", tab2_label: "Questionário de custos",
     continue_btn: "Continuar para o questionário →",
     presentation_card_title: "Tipo de café e produtividade",
     presentation_card_desc: "Usado para transformar o custo de produção em preço por kg. A razão de conversão para GBE (quantos kg desse tipo equivalem a 1 kg GBE) é preenchida automaticamente, mas pode ser ajustada.",
     field_presentation: "Tipo de café vendido", field_gbe_ratio: "Kg deste tipo = 1 kg GBE",
-    field_yield: "Produtividade real (kg/ha, nesse tipo)", field_yield_equiv: "Produtividade equivalente",
+    field_yield: "Produtividade real (kg/{u}, nesse tipo)", field_yield_equiv: "Produtividade equivalente",
     presentation_cherry: "Cereja", presentation_dried_cherry: "Cereja seca", presentation_wet_parchment: "Perg. lavado",
     presentation_dry_parchment: "Perg. seco", presentation_green_bean: "Verde (GBE)",
     activity_group1_title: "1. Implantação da Lavoura", activity_group1_desc: "Atividades para iniciar ou renovar os talhões de café.",
@@ -689,19 +722,19 @@ const TRANSLATIONS = {
     ph_amount: "valor", ph_days: "dias", ph_fixed_amount: "valor fixo", ph_purchase_cost: "custo de compra", ph_useful_life: "vida útil (anos)",
     ph_activity_name: "Nome da atividade (ex.", ph_tool_equipment: "Descrição (ex. ferramenta ou equipamento)",
     add_entry_prefix: "+ Adicionar", add_activity_btn: "+ Adicionar atividade", remove_btn_title: "Remover",
-    kpi_total: "CPS Total", kpi_total_unit: "moeda/unidade", kpi_inputs: "Insumos", kpi_household_days: "Dias MO familiar",
+    kpi_total: "CPS Total", kpi_total_unit: "{c}/{u}", kpi_inputs: "Insumos", kpi_household_days: "Dias MO familiar",
     kpi_hired_cost: "MO contratada (custo)", kpi_hired_days: "Dias MO contratada", kpi_variable: "Custos variáveis", kpi_fixed: "Custos fixos",
     section_categories: "Categorias de custo", edit_activities_link: "Editar atividades selecionadas",
     empty_categories: "Nenhuma atividade selecionada ainda.", empty_categories_link: "Vá à Aba 1 para selecionar as atividades da propriedade.",
     empty_summary: "Nenhuma categoria selecionada.",
-    subtotal_prefix: "Subtotal", subtotal_unit: "moeda / unidade de área",
+    subtotal_prefix: "Subtotal", subtotal_unit: "{c} / {u}",
     subtotal_note: "MO familiar:", subtotal_note_mid: "dias · MO contratada:", subtotal_note_wage: "dias (diária",
     table_title: "Resumo por categoria", table_note: "Somente totais — o detalhe linha a linha fica no questionário, não neste resumo.",
     th_category: "Categoria", th_mode: "Modo de entrada", th_hh_days: "Dias MO familiar", th_hired_days: "Dias MO contratada",
-    th_total: "Total (moeda/unidade de área)", th_price_pres: "Preço/kg (tipo)", th_price_gbe: "Preço/kg GBE",
+    th_total: "Total ({c}/{u})", th_price_pres: "Preço/kg (tipo)", th_price_gbe: "Preço/kg GBE",
     total_cps_row: "Total CPS",
-    yield_gbe_suffix: "kg GBE/ha",
-    unit_per_year: "/ano", unit_per_ha: "/ha", cost_colon: "Custo:",
+    yield_gbe_suffix: "kg GBE/{u}",
+    unit_per_year: "/ano", unit_per_area: "/{u}", cost_colon: "Custo:",
     btn_my_records: "Meus FGD", btn_new_record: "+ Novo FGD",
     btn_export_this_json: "Salvar este FGD (JSON)", btn_export_this_csv: "Exportar este FGD (CSV)",
     btn_export_all_csv: "Exportar todos (CSV)", btn_export_all_json: "Backup de todos (JSON)",
@@ -714,13 +747,17 @@ const TRANSLATIONS = {
     records_empty_body: "Comecem o primeiro FGD. Ele fica neste dispositivo até ser exportado.",
     untitled_fgd: "FGD sem nome", no_coop: "Cooperativa não informada",
     col_updated: "Última alteração", record_open_now: "Aberto agora",
-    compare_title: "Comparação entre FGD",
-    compare_help: "Todos os FGD salvos neste dispositivo, lado a lado. As médias só fazem sentido quando os FGD usam a mesma moeda e unidade de área, então confiram a coluna de moeda antes de lê-las.",
+    tab_list_records: "Meus FGD", tab_list_compare: "Comparar FGD",
+    compare_help: "Todos os FGD salvos neste dispositivo, lado a lado. Usem os filtros para comparar o que é comparável: um preço por kg de cereja e um por kg de pergaminho não são a mesma coisa. O preço por kg GBE é o único comparável entre tipos diferentes.",
     compare_need_more: "Salvem pelo menos dois FGD para poder compará-los.",
-    compare_mixed_currency: "Atenção: estes FGD não usam todos a mesma moeda ou unidade de área. A linha de média mistura unidades e não deve ser reportada como está.",
+    compare_no_match: "Nenhum FGD corresponde a estes filtros.",
+    compare_mixed_currency: "Estes FGD não usam todos a mesma moeda ou unidade de área, então as médias de dinheiro ficam em branco. Filtrem por moeda e unidade de área para vê-las.",
+    compare_mixed_presentation: "Estes FGD não vendem todos o mesmo tipo de café, então as médias de produtividade e de preço por kg ficam em branco. O preço por kg GBE continua comparável. Filtrem por tipo de café para ver o resto.",
     compare_avg: "Média",
-    th_fgd: "FGD", th_coop: "Cooperativa", th_currency: "Moeda", th_wage: "Diária",
-    th_type: "Tipo de café", th_yield: "Produtividade (kg/ha)", th_yield_gbe: "Produtividade (kg GBE/ha)",
+    filter_presentation: "Tipo de café", filter_currency: "Moeda", filter_area_unit: "Unidade de área",
+    filter_all: "Todos", filter_reset: "Limpar filtros",
+    th_fgd: "FGD", th_coop: "Cooperativa", th_currency: "Moeda / unidade", th_wage: "Diária", th_total_compare: "CPS Total",
+    th_type: "Tipo de café", th_yield: "Produtividade", th_yield_gbe: "Produtividade (GBE)",
     modal_cancel: "Cancelar", modal_confirm: "Confirmar", modal_delete: "Apagar",
     confirm_delete_record: "Apagar este FGD e tudo que foi digitado nele? Não é possível desfazer.",
     confirm_delete_all: "Apagar todos os FGD salvos neste dispositivo? Não é possível desfazer. Se não tiverem certeza, façam primeiro um backup JSON.",
@@ -733,6 +770,23 @@ const TRANSLATIONS = {
 let appLang = "en";
 function t(key){
   return (TRANSLATIONS[appLang] && TRANSLATIONS[appLang][key]) || TRANSLATIONS.en[key] || key;
+}
+
+// The area unit is chosen per FGD, so every label that mentions one is built at
+// render time rather than hardcoded. Strings carry {u} for the area unit and {c}
+// for the currency; ti() fills them in for a given record.
+function areaUnitOf(rec){
+  const r = rec || state;
+  if(!r) return t("unit_short_ha");
+  if(r.areaUnit === "otro") return (r.areaUnitOther || "").trim() || t("unit_generic");
+  return t("unit_short_" + r.areaUnit) || t("unit_generic");
+}
+function currencyOf(rec){
+  const r = rec || state;
+  return (r && (r.currency || "").trim()) || t("unit_currency_generic");
+}
+function ti(key, rec){
+  return t(key).replace(/\{u\}/g, areaUnitOf(rec)).replace(/\{c\}/g, currencyOf(rec));
 }
 
 // Escapes text before it goes into an HTML attribute or text node. Without this a
@@ -837,6 +891,7 @@ let records = {};       // id -> record
 let currentId = null;   // id of the record open in the editor
 let state = null;       // the open record itself (kept as `state` so the form code reads the same)
 let screen = "list";    // "list" = overview of FGDs, "editor" = one FGD open
+let compareFilters = { presentation: "", currency: "", areaUnit: "" };
 
 function generateRecordId(){
   return "fgd_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
@@ -889,7 +944,7 @@ function defaultRecord(){
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     },
-    fgdName: "", floId: "", coopName: "", areaUnit: "ha", currency: "", dailyWage: "",
+    fgdName: "", floId: "", coopName: "", areaUnit: "ha", areaUnitOther: "", currency: "", dailyWage: "",
     presentation: "cherry", gbeRatio: "5.00", yieldPerHa: "",
     selectedActivities: emptyActivitiesState(),
     activeTab: "activities",
@@ -905,6 +960,9 @@ function sanitizeRecord(parsed){
     categories: Object.assign(base.categories, (parsed && parsed.categories) || {})
   });
   if(!merged.meta.id) merged.meta.id = generateRecordId();
+  // The comparison moved out of the editor, so a record saved on that tab must not
+  // reopen onto a tab that no longer exists there.
+  if(merged.activeTab !== "questionnaire") merged.activeTab = "activities";
   // Records saved before this version had lang at the top level instead of in meta.
   if(parsed && parsed.lang && !(parsed.meta && parsed.meta.lang)) merged.meta.lang = parsed.lang;
   // Migrate sessions saved before the switch from a "kg presentation x factor = kg GBE" multiplier
@@ -1204,7 +1262,7 @@ function renderRecordsList(){
         <div class="record-card-main">
           <div class="record-card-title">${esc(rec.fgdName || t("untitled_fgd"))}</div>
           <div class="record-card-sub">${esc(rec.coopName || t("no_coop"))}${rec.floId ? " · " + esc(rec.floId) : ""}</div>
-          <div class="record-card-total">${esc(t("kpi_total"))}: ${fmt(s.total)}${cur} / ${esc(rec.areaUnit)}</div>
+          <div class="record-card-total">${esc(t("kpi_total"))}: ${fmt(s.total)}${cur} / ${esc(areaUnitOf(rec))}</div>
           <div class="record-card-date">${esc(t("col_updated"))}: ${esc(fmtDate(rec.meta.updatedAt))}${isCurrent ? " · " + esc(t("record_open_now")) : ""}</div>
         </div>
         <div class="record-card-actions">
@@ -1240,8 +1298,21 @@ function applyScreen(){
 function goToRecordsList(){
   screen = "list";
   applyScreen();
-  renderRecordsList();
+  switchListTab(listTab);
   window.scrollTo(0, 0);
+}
+
+// Every label that names an area unit is rebuilt from the record, so switching from
+// hectares to manzanas relabels the yield field, the questionnaire and the summary
+// header together instead of leaving "kg/ha" sitting next to manzana costs.
+function refreshUnitLabels(){
+  const isOther = state && state.areaUnit === "otro";
+  document.getElementById("areaUnitOtherField").style.display = isOther ? "" : "none";
+  applyStaticTranslations();
+  if(state){
+    updateYieldGbeDisplay();
+    renderQuestionnaireTab();
+  }
 }
 
 function fillSetupFields(){
@@ -1249,6 +1320,7 @@ function fillSetupFields(){
   document.getElementById("floId").value = state.floId || "";
   document.getElementById("coopName").value = state.coopName || "";
   document.getElementById("areaUnit").value = state.areaUnit || "ha";
+  document.getElementById("areaUnitOther").value = state.areaUnitOther || "";
   document.getElementById("currency").value = state.currency || "";
   document.getElementById("dailyWage").value = state.dailyWage || "";
   document.getElementById("presentationSelect").value = state.presentation || "cherry";
@@ -1264,9 +1336,10 @@ function openRecord(id){
   screen = "editor";
   applyScreen();
   fillSetupFields();
+  refreshUnitLabels();
   renderActivitiesTab();
   renderQuestionnaireTab();
-  switchTab(state.activeTab === "questionnaire" ? "questionnaire" : (state.activeTab === "compare" ? "compare" : "activities"));
+  switchTab(state.activeTab === "questionnaire" ? "questionnaire" : "activities");
   setSaveStatus(t("save_status_auto"));
   window.scrollTo(0, 0);
 }
@@ -1294,6 +1367,7 @@ function deleteAllRecords(){
     state = null;
     persistAllRecords(records);
     screen = "list";
+    compareFilters = { presentation: "", currency: "", areaUnit: "" };
     goToRecordsList();
   });
 }
@@ -1431,7 +1505,7 @@ function activityComponentFieldsHtml(catId, activityIndex, values){
   const gridComps = comps.filter(c => !c.hasContractOption && !c.hasDepreciation);
 
   const gridHtml = gridComps.map(c => {
-    const suffix = c.type === "days" ? ` (${t("ph_days")}${t("unit_per_ha")})` : ` (${t("unit_per_ha")})`;
+    const suffix = c.type === "days" ? ` (${t("ph_days")}${ti("unit_per_area")})` : ` (${ti("unit_per_area")})`;
     return `
       <div class="field">
         <label>${esc(t(c.labelKey) + suffix)}</label>
@@ -1457,10 +1531,10 @@ function activityComponentFieldsHtml(catId, activityIndex, values){
         </div>
         <div class="ahb-row">
           ${isLumpsum
-            ? `<input type="number" step="any" min="0" placeholder="${esc(t('ph_fixed_amount') + ' ' + t('unit_per_ha'))}" data-path="${basePath}.value" value="${esc(entry.value)}">`
-            : `<input type="number" step="any" min="0" placeholder="${esc(t('ph_days') + t('unit_per_ha'))}" data-path="${basePath}.days" value="${esc(entry.days)}">`
+            ? `<input type="number" step="any" min="0" placeholder="${esc(t('ph_fixed_amount') + ' ' + ti('unit_per_area'))}" data-path="${basePath}.value" value="${esc(entry.value)}">`
+            : `<input type="number" step="any" min="0" placeholder="${esc(t('ph_days') + ti('unit_per_area'))}" data-path="${basePath}.days" value="${esc(entry.days)}">`
           }
-          <span class="computed-cost" data-activity-cost="${catId}|${activityIndex}|${hiredComp.id}">${esc(t("cost_colon"))} ${fmt(entryCost)} ${esc(t("unit_per_ha"))}</span>
+          <span class="computed-cost" data-activity-cost="${catId}|${activityIndex}|${hiredComp.id}">${esc(t("cost_colon"))} ${fmt(entryCost)} ${esc(ti("unit_per_area"))}</span>
         </div>
       </div>`;
   }
@@ -1535,7 +1609,7 @@ function renderCategories(){
           <button type="button" class="add-activity-btn" data-add-activity="${cat.id}">${esc(t("add_activity_btn"))}</button>
         `}
         <div class="subtotal-line">
-          ${esc(t("subtotal_prefix"))} ${esc(t(cat.labelKey))}: <strong data-cat-subtotal="${cat.id}">${fmt(total)}</strong> ${esc(t("subtotal_unit"))}
+          ${esc(t("subtotal_prefix"))} ${esc(t(cat.labelKey))}: <strong data-cat-subtotal="${cat.id}">${fmt(total)}</strong> ${esc(ti("subtotal_unit"))}
           <span class="note" data-cat-note="${cat.id}">${esc(t("subtotal_note"))} ${fmtDays(hhDays)} ${esc(t("subtotal_note_mid"))} ${fmtDays(hiredDays)} ${esc(t("subtotal_note_wage"))} ${fmt(wage())})</span>
         </div>
       </div>
@@ -1720,7 +1794,7 @@ function updateTotalsOnly(){
         if(hiredComp){
           const entry = act[hiredComp.id] || {};
           const el = document.querySelector(`[data-activity-cost="${cat.id}|${i}|${hiredComp.id}"]`);
-          if(el) el.textContent = `${t("cost_colon")} ${fmt(entry.entryType === "lumpsum" ? num(entry.value) : num(entry.days) * wage())} ${t("unit_per_ha")}`;
+          if(el) el.textContent = `${t("cost_colon")} ${fmt(entry.entryType === "lumpsum" ? num(entry.value) : num(entry.days) * wage())} ${ti("unit_per_area")}`;
         }
         const fixedComp = COMPONENTS.find(c => c.hasDepreciation);
         if(fixedComp){
@@ -1732,7 +1806,7 @@ function updateTotalsOnly(){
     }
   });
 
-  document.getElementById("totalCosp").innerHTML = fmt(grand) + ` <small>${esc(t("kpi_total_unit"))}</small>`;
+  document.getElementById("totalCosp").innerHTML = fmt(grand) + ` <small>${esc(ti("kpi_total_unit"))}</small>`;
   document.getElementById("totalInputs").textContent = fmt(grandComponents.inputs);
   document.getElementById("totalHouseholdDays").innerHTML = fmtDays(hhDaysGrand) + ` <small>${esc(t("ph_days"))}</small>`;
   document.getElementById("totalHired").textContent = fmt(grandComponents.hired);
@@ -1762,7 +1836,7 @@ function renderSummaryTable(){
       <td data-label="${esc(t("th_mode"))}">${esc(modeLabel)}</td>
       <td class="num" data-label="${esc(t("th_hh_days"))}">${fmtDays(hh)}</td>
       <td class="num" data-label="${esc(t("th_hired_days"))}">${fmtDays(hd)}</td>
-      <td class="num" data-label="${esc(t("th_total"))}">${fmt(total)}</td>
+      <td class="num" data-label="${esc(ti("th_total"))}">${fmt(total)}</td>
       <td class="num" data-label="${esc(t("th_price_pres"))}">${fmtPrice(pricePerKgPresentation(total))}</td>
       <td class="num" data-label="${esc(t("th_price_gbe"))}">${fmtPrice(pricePerKgGbe(total))}</td>
     </tr>`;
@@ -1773,7 +1847,7 @@ function renderSummaryTable(){
       <td class="empty-cell" data-label="${esc(t("th_mode"))}"></td>
       <td class="num" data-label="${esc(t("th_hh_days"))}">${fmtDays(hhGrand)}</td>
       <td class="num" data-label="${esc(t("th_hired_days"))}">${fmtDays(hiredGrand)}</td>
-      <td class="num" data-label="${esc(t("th_total"))}">${fmt(grand)}</td>
+      <td class="num" data-label="${esc(ti("th_total"))}">${fmt(grand)}</td>
       <td class="num" data-label="${esc(t("th_price_pres"))}">${fmtPrice(pricePerKgPresentation(grand))}</td>
       <td class="num" data-label="${esc(t("th_price_gbe"))}">${fmtPrice(pricePerKgGbe(grand))}</td>
     </tr>`;
@@ -1788,39 +1862,101 @@ function renderQuestionnaireTab(){
 
 function renderCompareTab(){
   const container = document.getElementById("compareContainer");
-  const list = sortedRecords();
-  if(list.length < 2){
+  const all = sortedRecords();
+  if(all.length < 2){
     container.innerHTML = `<div class="empty-state">${esc(t("compare_need_more"))}</div>`;
     return;
   }
-  const currencies = new Set(list.map(r => (r.currency || "").trim().toUpperCase() + "|" + (r.areaUnit || "")));
-  const mixed = currencies.size > 1;
+
+  // Filter options are built from the FGDs actually on the device, so the dropdowns
+  // never offer a currency or coffee type nobody captured.
+  const presOptions = [...new Set(all.map(r => r.presentation))];
+  const curOptions  = [...new Set(all.map(r => (r.currency || "").trim()))].filter(Boolean);
+  const unitOptions = [...new Set(all.map(r => areaUnitOf(r)))];
+
+  // Drop any filter value that no longer exists (e.g. after deleting an FGD).
+  if(compareFilters.presentation && !presOptions.includes(compareFilters.presentation)) compareFilters.presentation = "";
+  if(compareFilters.currency && !curOptions.includes(compareFilters.currency)) compareFilters.currency = "";
+  if(compareFilters.areaUnit && !unitOptions.includes(compareFilters.areaUnit)) compareFilters.areaUnit = "";
+
+  const list = all.filter(r =>
+    (!compareFilters.presentation || r.presentation === compareFilters.presentation) &&
+    (!compareFilters.currency || (r.currency || "").trim() === compareFilters.currency) &&
+    (!compareFilters.areaUnit || areaUnitOf(r) === compareFilters.areaUnit));
+
+  const hasFilter = compareFilters.presentation || compareFilters.currency || compareFilters.areaUnit;
+  const sel = (id, label, options, current, labelFn) => `
+    <div class="field">
+      <label>${esc(label)}</label>
+      <select data-compare-filter="${id}">
+        <option value="">${esc(t("filter_all"))}</option>
+        ${options.map(o => `<option value="${esc(o)}" ${o === current ? "selected" : ""}>${esc(labelFn ? labelFn(o) : o)}</option>`).join("")}
+      </select>
+    </div>`;
+  const filterBar = `
+    <div class="filter-bar">
+      ${sel("presentation", t("filter_presentation"), presOptions, compareFilters.presentation, presentationLabel)}
+      ${sel("currency", t("filter_currency"), curOptions, compareFilters.currency)}
+      ${sel("areaUnit", t("filter_area_unit"), unitOptions, compareFilters.areaUnit)}
+      ${hasFilter ? `<button type="button" class="btn btn-outline btn-sm filter-reset" data-compare-filter-reset>${esc(t("filter_reset"))}</button>` : ""}
+    </div>`;
+
+  function wireFilters(){
+    container.querySelectorAll("[data-compare-filter]").forEach(el => {
+      el.addEventListener("change", () => {
+        compareFilters[el.getAttribute("data-compare-filter")] = el.value;
+        renderCompareTab();
+      });
+    });
+    const reset = container.querySelector("[data-compare-filter-reset]");
+    if(reset) reset.addEventListener("click", () => {
+      compareFilters = { presentation: "", currency: "", areaUnit: "" };
+      renderCompareTab();
+    });
+  }
+
+  if(!list.length){
+    container.innerHTML = filterBar + `<div class="empty-state">${esc(t("compare_no_match"))}</div>`;
+    wireFilters();
+    return;
+  }
+
+  // A kilo of cherry and a kilo of parchment are different things, so averaging yield
+  // or price per kg across coffee types produces a number that means nothing. Same for
+  // money across currencies or area units. Those averages are blanked rather than shown,
+  // because a facilitator who never touches the filters should not be handed a wrong figure.
+  const mixedPresentation = new Set(list.map(r => r.presentation)).size > 1;
+  const mixedUnits = new Set(list.map(r => (r.currency || "").trim().toUpperCase() + "|" + areaUnitOf(r))).size > 1;
 
   const summaries = list.map(r => ({ rec: r, s: recordSummary(r) }));
   const avg = (pick) => {
-    const vals = summaries.map(pick).filter(v => v !== null && isFinite(v));
+    const vals = summaries.map(pick).filter(v => v !== null && v !== undefined && isFinite(v));
     return vals.length ? vals.reduce((a,b) => a+b, 0) / vals.length : null;
   };
+  const avgNum   = (pick, suppressed) => suppressed ? "—" : fmt(avg(pick) || 0);
+  const avgDays  = (pick, suppressed) => suppressed ? "—" : fmtDays(avg(pick) || 0);
+  const avgPrice = (pick, suppressed) => suppressed ? "—" : fmtPrice(avg(pick));
 
   const rows = summaries.map(({rec, s}) => `
     <tr>
       <td class="row-head" data-label="${esc(t("th_fgd"))}">${esc(rec.fgdName || t("untitled_fgd"))}</td>
       <td data-label="${esc(t("th_coop"))}">${esc(rec.coopName || "—")}</td>
-      <td data-label="${esc(t("th_currency"))}">${esc((rec.currency || "—") + " / " + rec.areaUnit)}</td>
+      <td data-label="${esc(t("th_currency"))}">${esc(currencyOf(rec) + " / " + areaUnitOf(rec))}</td>
       <td class="num" data-label="${esc(t("th_wage"))}">${fmt(wageOf(rec))}</td>
       <td data-label="${esc(t("th_type"))}">${esc(presentationLabel(rec.presentation))}</td>
       <td class="num" data-label="${esc(t("th_yield"))}">${fmtDays(s.yieldPres)}</td>
       <td class="num" data-label="${esc(t("th_yield_gbe"))}">${fmtDays(s.yieldGbe)}</td>
       <td class="num" data-label="${esc(t("th_hh_days"))}">${fmtDays(s.hhDays)}</td>
       <td class="num" data-label="${esc(t("th_hired_days"))}">${fmtDays(s.hiredDays)}</td>
-      <td class="num" data-label="${esc(t("th_total"))}">${fmt(s.total)}</td>
+      <td class="num" data-label="${esc(ti("th_total", rec))}">${fmt(s.total)}</td>
       <td class="num" data-label="${esc(t("th_price_pres"))}">${fmtPrice(s.pricePres)}</td>
       <td class="num" data-label="${esc(t("th_price_gbe"))}">${fmtPrice(s.priceGbe)}</td>
     </tr>`).join("");
 
-  container.innerHTML = `
-    ${mixed ? `<div class="warn-note">${esc(t("compare_mixed_currency"))}</div>` : ""}
-    <div class="table-card" style="margin-top:0;">
+  container.innerHTML = filterBar
+    + (mixedPresentation ? `<div class="warn-note">${esc(t("compare_mixed_presentation"))}</div>` : "")
+    + (mixedUnits ? `<div class="warn-note">${esc(t("compare_mixed_currency"))}</div>` : "")
+    + `<div class="table-card" style="margin-top:0;">
       <table class="dt">
         <thead>
           <tr>
@@ -1833,7 +1969,7 @@ function renderCompareTab(){
             <th class="num">${esc(t("th_yield_gbe"))}</th>
             <th class="num">${esc(t("th_hh_days"))}</th>
             <th class="num">${esc(t("th_hired_days"))}</th>
-            <th class="num">${esc(t("th_total"))}</th>
+            <th class="num">${esc(t("th_total_compare"))}</th>
             <th class="num">${esc(t("th_price_pres"))}</th>
             <th class="num">${esc(t("th_price_gbe"))}</th>
           </tr>
@@ -1841,22 +1977,24 @@ function renderCompareTab(){
         <tbody>
           ${rows}
           <tr class="total-row">
-            <td class="row-head" data-label="${esc(t("th_fgd"))}">${esc(t("compare_avg"))}</td>
+            <td class="row-head" data-label="${esc(t("th_fgd"))}">${esc(t("compare_avg"))} (${list.length})</td>
             <td class="empty-cell"></td>
             <td class="empty-cell"></td>
-            <td class="num" data-label="${esc(t("th_wage"))}">${fmt(avg(x => wageOf(x.rec)) || 0)}</td>
+            <td class="num" data-label="${esc(t("th_wage"))}">${avgNum(x => wageOf(x.rec), mixedUnits)}</td>
             <td class="empty-cell"></td>
-            <td class="num" data-label="${esc(t("th_yield"))}">${fmtDays(avg(x => x.s.yieldPres) || 0)}</td>
-            <td class="num" data-label="${esc(t("th_yield_gbe"))}">${fmtDays(avg(x => x.s.yieldGbe) || 0)}</td>
-            <td class="num" data-label="${esc(t("th_hh_days"))}">${fmtDays(avg(x => x.s.hhDays) || 0)}</td>
-            <td class="num" data-label="${esc(t("th_hired_days"))}">${fmtDays(avg(x => x.s.hiredDays) || 0)}</td>
-            <td class="num" data-label="${esc(t("th_total"))}">${fmt(avg(x => x.s.total) || 0)}</td>
-            <td class="num" data-label="${esc(t("th_price_pres"))}">${fmtPrice(avg(x => x.s.pricePres))}</td>
-            <td class="num" data-label="${esc(t("th_price_gbe"))}">${fmtPrice(avg(x => x.s.priceGbe))}</td>
+            <td class="num" data-label="${esc(t("th_yield"))}">${avgDays(x => x.s.yieldPres, mixedPresentation)}</td>
+            <td class="num" data-label="${esc(t("th_yield_gbe"))}">${avgDays(x => x.s.yieldGbe, false)}</td>
+            <td class="num" data-label="${esc(t("th_hh_days"))}">${avgDays(x => x.s.hhDays, false)}</td>
+            <td class="num" data-label="${esc(t("th_hired_days"))}">${avgDays(x => x.s.hiredDays, false)}</td>
+            <td class="num" data-label="${esc(t("th_total_compare"))}">${avgNum(x => x.s.total, mixedUnits)}</td>
+            <td class="num" data-label="${esc(t("th_price_pres"))}">${avgPrice(x => x.s.pricePres, mixedPresentation || mixedUnits)}</td>
+            <td class="num" data-label="${esc(t("th_price_gbe"))}">${avgPrice(x => x.s.priceGbe, mixedUnits)}</td>
           </tr>
         </tbody>
       </table>
     </div>`;
+
+  wireFilters();
 }
 
 // ==================== TABS ====================
@@ -1866,27 +2004,41 @@ function switchTab(tab){
     state.activeTab = tab;
     saveState();
   }
-  ["activities","questionnaire","compare"].forEach(name => {
+  ["activities","questionnaire"].forEach(name => {
     const panelId = "tabPanel" + name.charAt(0).toUpperCase() + name.slice(1);
     const btnId = "tabBtn" + name.charAt(0).toUpperCase() + name.slice(1);
     document.getElementById(panelId).classList.toggle("active", tab === name);
     document.getElementById(btnId).classList.toggle("active", tab === name);
   });
-  if(tab === "compare") renderCompareTab();
+}
+
+// The overview screen has its own two tabs: the list of FGDs, and the comparison
+// across all of them. The comparison is a property of the whole device, not of any
+// one FGD, so it lives here rather than inside an open questionnaire.
+let listTab = "records";
+function switchListTab(tab){
+  listTab = tab;
+  document.getElementById("listPanelRecords").classList.toggle("active", tab === "records");
+  document.getElementById("listPanelCompare").classList.toggle("active", tab === "compare");
+  document.getElementById("listTabRecords").classList.toggle("active", tab === "records");
+  document.getElementById("listTabCompare").classList.toggle("active", tab === "compare");
+  if(tab === "records") renderRecordsList(); else renderCompareTab();
 }
 
 // ==================== LANGUAGE ====================
 
 function applyStaticTranslations(){
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
+  document.querySelectorAll("[data-i18n], [data-i18n-unit]").forEach(el => {
+    const unitKey = el.getAttribute("data-i18n-unit");
+    const key = unitKey || el.getAttribute("data-i18n");
+    const value = unitKey ? ti(unitKey) : t(key);
     // Only replace this node's own text, not any nested elements (e.g. the logo's <span>,
     // or KPI cards whose value is filled in separately by updateTotalsOnly).
     const directTextNode = [...el.childNodes].find(n => n.nodeType === 3);
     if(directTextNode){
-      directTextNode.textContent = t(key);
+      directTextNode.textContent = value;
     } else if(!el.children.length){
-      el.textContent = t(key);
+      el.textContent = value;
     }
   });
   document.title = t("app_title") + " — " + t("app_subtitle");
@@ -1910,9 +2062,8 @@ function setLanguage(lang){
     updateYieldGbeDisplay();
     renderActivitiesTab();
     renderQuestionnaireTab();
-    if(document.getElementById("tabPanelCompare").classList.contains("active")) renderCompareTab();
   }
-  if(screen === "list") renderRecordsList();
+  if(screen === "list") switchListTab(listTab);
 }
 
 // ==================== SETUP FIELDS ====================
@@ -1929,13 +2080,14 @@ function bindSetupField(id, key, extra){
 function updateYieldGbeDisplay(){
   if(!state) return;
   const y = yieldGbePerHa();
-  document.getElementById("yieldGbeDisplay").value = (y > 0 ? fmtDays(y) : "0.0") + " " + t("yield_gbe_suffix");
+  document.getElementById("yieldGbeDisplay").value = (y > 0 ? fmtDays(y) : "0.0") + " " + ti("yield_gbe_suffix");
 }
 
 bindSetupField("fgdName", "fgdName");
 bindSetupField("floId", "floId");
 bindSetupField("coopName", "coopName");
-bindSetupField("currency", "currency");
+bindSetupField("currency", "currency", refreshUnitLabels);
+bindSetupField("areaUnitOther", "areaUnitOther", refreshUnitLabels);
 bindSetupField("dailyWage", "dailyWage", updateTotalsOnly);
 bindSetupField("gbeRatioInput", "gbeRatio", () => { updateYieldGbeDisplay(); updateTotalsOnly(); });
 bindSetupField("yieldPerHaInput", "yieldPerHa", () => { updateYieldGbeDisplay(); updateTotalsOnly(); });
@@ -1944,6 +2096,7 @@ document.getElementById("areaUnit").addEventListener("change", (e) => {
   if(!state) return;
   state.areaUnit = e.target.value;
   saveState();
+  refreshUnitLabels();
 });
 
 document.getElementById("presentationSelect").addEventListener("change", (e) => {
@@ -1961,9 +2114,10 @@ document.querySelectorAll("#langToggle button").forEach(btn => {
   btn.addEventListener("click", () => setLanguage(btn.getAttribute("data-lang")));
 });
 
+document.getElementById("listTabRecords").addEventListener("click", () => switchListTab("records"));
+document.getElementById("listTabCompare").addEventListener("click", () => switchListTab("compare"));
 document.getElementById("tabBtnActivities").addEventListener("click", () => switchTab("activities"));
 document.getElementById("tabBtnQuestionnaire").addEventListener("click", () => switchTab("questionnaire"));
-document.getElementById("tabBtnCompare").addEventListener("click", () => switchTab("compare"));
 document.getElementById("continueToQuestionnaire").addEventListener("click", () => switchTab("questionnaire"));
 document.getElementById("editActivitiesLink").addEventListener("click", () => switchTab("activities"));
 
@@ -2010,12 +2164,13 @@ function csvColumnsForRecord(rec){
   push("flo_id", rec.floId);
   push("coop_name", rec.coopName);
   push("area_unit", rec.areaUnit);
+  push("area_unit_custom_name", rec.areaUnitOther || "");
   push("currency", rec.currency);
   push("daily_wage", rec.dailyWage);
   push("coffee_type", rec.presentation);
   push("gbe_ratio_kg_of_type_per_1kg_gbe", rec.gbeRatio);
-  push("yield_kg_per_ha_in_type", rec.yieldPerHa);
-  push("yield_kg_gbe_per_ha", s.yieldGbe);
+  push("yield_kg_per_area_unit_in_type", rec.yieldPerHa);
+  push("yield_kg_gbe_per_area_unit", s.yieldGbe);
 
   CATEGORIES.forEach(cat => {
     const c = s.perCategory[cat.id];
@@ -2148,7 +2303,7 @@ document.getElementById("importFileInput").addEventListener("change", (e) => {
   }else{
     screen = "list";
     applyScreen();
-    renderRecordsList();
+    switchListTab("records");
   }
   setSaveStatus(t("save_status_auto"));
 })();

@@ -55,15 +55,44 @@ mezclar los datos.
 Un dispositivo aguanta sin problema del orden de 100 FGD. El límite real es el espacio de
 almacenamiento del navegador, no un número fijo.
 
-### Las tres pestañas
+### Pantalla de inicio: dos pestañas
+
+- **Mis FGD** — la lista de FGD guardados.
+- **Comparar FGD** — todos los FGD del dispositivo lado a lado, con una fila de promedio.
+
+La comparación vive aquí, no dentro de un FGD, porque compara todo el dispositivo y no
+tendría sentido tener que abrir un FGD cualquiera para verla.
+
+**Filtros.** Arriba de la tabla hay tres filtros: presentación, moneda y unidad de área. El
+promedio se recalcula sobre lo que quede visible, y la etiqueta indica cuántos FGD entraron,
+por ejemplo "Promedio (8)".
+
+**Promedios que se dejan en blanco.** Un kilo de cereza y un kilo de pergamino seco no son lo
+mismo, así que promediar rendimiento o precio por kg entre presentaciones distintas da un
+número sin sentido. Cuando los FGD visibles no comparten presentación, esos dos promedios
+salen como "—" y aparece un aviso explicando por qué. Lo mismo pasa con los promedios de
+dinero (jornal, CPS total, precios) cuando se mezclan monedas o unidades de área. Los valores
+de cada fila siguen visibles, porque cada uno por separado sí es válido.
+
+El **precio por kg GBE** es la única columna de precio comparable entre presentaciones
+distintas. Para eso existe.
+
+### Dentro de un FGD: dos pestañas
 
 1. **Actividades de la finca** — qué actividades se hacen, qué presentación de café se vende y
    el rendimiento. Determina qué preguntas de costo aparecen después.
 2. **Cuestionario de costos** — solo las categorías que corresponden a lo marcado en la
    pestaña 1. Cada categoría se puede llenar en modo global o actividad por actividad.
-3. **Comparar FGD** — todos los FGD del dispositivo lado a lado, con una fila de promedio.
-   Si los FGD no usan la misma moneda o unidad de área, aparece un aviso: el promedio mezcla
-   unidades y no debe reportarse tal cual.
+
+### Unidad de área
+
+La herramienta nunca convierte entre unidades. Todo se captura en la unidad que se elija, y el
+precio por kg sale de dividir el costo por unidad entre el rendimiento por unidad, así que el
+cálculo es correcto en cualquier unidad mientras las dos cifras estén en la misma.
+
+Las etiquetas siguen la unidad elegida: si se elige Manzana, el campo de rendimiento pide
+kg/mz y el cuestionario dice mz, no ha. Si se elige **Otra**, aparece un campo para escribir
+el nombre local de la unidad (por ejemplo cuerda o tarea) y las etiquetas lo usan.
 
 ### Guardado
 
@@ -92,6 +121,11 @@ Los nombres de columna del CSV usan identificadores fijos en inglés (`fertiliza
 `total_cps_per_area_unit`, etc.), no las etiquetas traducidas. Así los archivos de
 facilitadores que trabajan en distinto idioma se alinean en la misma hoja maestra. El CSV de
 un solo FGD y el de todos tienen exactamente las mismas columnas.
+
+Ninguna columna asume hectáreas. Los rendimientos salen como
+`yield_kg_per_area_unit_in_type` y `yield_kg_gbe_per_area_unit`, y la unidad de cada FGD viene
+en `area_unit` (más `area_unit_custom_name` cuando el FGD usa una unidad propia). Al consolidar
+en la hoja maestra hay que revisar esas columnas antes de sumar o promediar entre FGD.
 
 ## Actualizar la app más adelante
 
