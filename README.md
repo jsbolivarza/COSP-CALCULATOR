@@ -1,151 +1,186 @@
-# Calculadora CPS — app instalable (PWA)
+# CPS Calculator (PWA)
 
-Herramienta para calcular el Costo de Producción Sostenible del café durante los grupos
-focales (FGD). Se instala como app en un teléfono, tablet o computador y funciona sin
-conexión después de la primera vez que se abre.
+*Español: [README.es.md](README.es.md)*
 
-Los archivos deben estar publicados en un sitio con HTTPS. No sirve abrir `index.html`
-haciendo doble clic: sin HTTPS el navegador no instala la app ni guarda la copia para uso
-sin conexión. GitHub Pages cumple ese requisito y es gratis.
+A tool for calculating the Sustainable Production Cost (Costo de Producción Sostenible) of
+coffee during focus group discussions. It installs as an app on a phone, tablet or computer
+and works offline after the first time it is opened.
 
-## Archivos
+The interface is available in English, Spanish and Portuguese, switchable at any time from the
+header.
 
-- `index.html` — la calculadora completa (interfaz, traducciones, cálculos, guardado).
-- `manifest.json` — nombre, ícono y colores de la app instalada.
-- `sw.js` — el "service worker": guarda una copia de la app en el dispositivo la primera vez
-  que se abre, para que funcione sin internet después.
-- `icon-192.png`, `icon-512.png` — íconos de la app.
+The files must be published on a site served over HTTPS. Opening `index.html` by double
+clicking it will not work: without HTTPS the browser refuses to install the app or to save an
+offline copy. GitHub Pages meets that requirement and is free.
 
-Los cinco archivos van juntos en la raíz del repositorio, con esos nombres exactos.
+## Files
 
-## Publicar en GitHub Pages
+The five files the app needs to run:
 
-1. En GitHub, crear un repositorio nuevo (Pages gratis en cuentas personales requiere que el
-   repositorio sea público).
-2. Subir los 5 archivos a la raíz del repositorio, manteniendo los nombres exactos.
-3. Ir a **Settings → Pages**.
-4. En "Build and deployment", elegir **Deploy from a branch**, rama `main` (o `master`),
-   carpeta `/ (root)`.
-5. Guardar. GitHub tarda uno o dos minutos en publicar el sitio.
-6. La URL quedará como: `https://SU-USUARIO.github.io/NOMBRE-DEL-REPOSITORIO/`
+- `index.html` is the entire calculator: interface, translations, calculations and storage.
+- `manifest.json` gives the browser the name, icon and colours of the installed app.
+- `sw.js` is the service worker. It stores a copy of the app on the device the first time it
+  is opened so the app works without internet afterwards.
+- `icon-192.png` and `icon-512.png` are the app icons.
 
-## Instalar en un dispositivo
+Those five go together in the root of the repository, with exactly those names.
 
-- **Android (Chrome):** abrir la URL, tocar el menú (⋮) y elegir "Instalar app" o "Añadir a
-  pantalla de inicio".
-- **iPhone / iPad (Safari):** abrir la URL en Safari, tocar el ícono de compartir (□↑) y elegir
-  "Añadir a pantalla de inicio". iPhone no muestra un aviso automático como Android; hay que
-  hacerlo manualmente la primera vez. Usar Safari, no Chrome ni Edge en iOS.
-- **Computador (Chrome/Edge):** aparecerá un ícono de instalación en la barra de direcciones.
+Alongside them sit `README.md` and `README.es.md`, the same documentation in English and
+Spanish. They are for whoever maintains or deploys the tool. The app itself never reads them,
+so they can be edited or removed without affecting anything. Keep both in step when one
+changes.
 
-## Cómo se usa
+## Publishing on GitHub Pages
 
-### Varios FGD en un mismo dispositivo
+1. Create a new repository on GitHub. Free Pages on a personal account requires the repository
+   to be public.
+2. Upload the five app files to the root of the repository, keeping the names exactly as they
+   are. The README files can go up too; they are ignored by the app.
+3. Go to **Settings**, then **Pages**.
+4. Under "Build and deployment", choose **Deploy from a branch**, branch `main` (or `master`),
+   folder `/ (root)`.
+5. Save. GitHub takes a minute or two to publish the site.
+6. The URL will look like `https://YOUR-USERNAME.github.io/REPOSITORY-NAME/`
 
-Al abrir la app aparece la lista de FGD guardados en ese dispositivo. Cada FGD se guarda por
-separado, así que un facilitador puede hacer varios grupos focales seguidos sin perder ni
-mezclar los datos.
+## Installing on a device
 
-- **+ Nuevo FGD** empieza uno nuevo, sin tocar los anteriores.
-- **Abrir** retoma un FGD ya empezado.
-- Cada tarjeta de la lista muestra el nombre, la cooperativa, el CPS total y la fecha del
-  último cambio, y tiene sus propios botones de JSON, CSV y borrar.
-- **Mis FGD** vuelve a esa lista desde cualquier pestaña.
+**Android (Chrome):** open the URL, tap the menu, then "Install app" or "Add to Home screen".
 
-Un dispositivo aguanta sin problema del orden de 100 FGD. El límite real es el espacio de
-almacenamiento del navegador, no un número fijo.
+**iPhone or iPad (Safari):** open the URL in Safari, tap the share icon, then "Add to Home
+Screen". iPhone does not prompt automatically the way Android does, so this has to be done by
+hand the first time. Use Safari itself, not Chrome or Edge on iOS.
 
-### Pantalla de inicio: dos pestañas
+**Computer (Chrome or Edge):** an install icon appears in the address bar.
 
-- **Mis FGD** — la lista de FGD guardados.
-- **Comparar FGD** — todos los FGD del dispositivo lado a lado, con una fila de promedio.
+## How it is used
 
-La comparación vive aquí, no dentro de un FGD, porque compara todo el dispositivo y no
-tendría sentido tener que abrir un FGD cualquiera para verla.
+### Home screen: two tabs
 
-**Filtros.** Arriba de la tabla hay tres filtros: presentación, moneda y unidad de área. El
-promedio se recalcula sobre lo que quede visible, y la etiqueta indica cuántos FGD entraron,
-por ejemplo "Promedio (8)".
+**My FGDs** lists every FGD saved on that device. **Compare FGDs** puts them all side by side.
 
-**Promedios que se dejan en blanco.** Un kilo de cereza y un kilo de pergamino seco no son lo
-mismo, así que promediar rendimiento o precio por kg entre presentaciones distintas da un
-número sin sentido. Cuando los FGD visibles no comparten presentación, esos dos promedios
-salen como "—" y aparece un aviso explicando por qué. Lo mismo pasa con los promedios de
-dinero (jornal, CPS total, precios) cuando se mezclan monedas o unidades de área. Los valores
-de cada fila siguen visibles, porque cada uno por separado sí es válido.
+Each FGD is stored separately, so one facilitator can run several focus groups in a row
+without losing or mixing the data.
 
-El **precio por kg GBE** es la única columna de precio comparable entre presentaciones
-distintas. Para eso existe.
+- **+ New FGD** starts a fresh one without touching the others.
+- **Open** picks up an FGD already started.
+- Each card in the list shows the name, the cooperative, the total CPS and the date of the last
+  change, and carries its own JSON, CSV and delete buttons.
+- **My FGDs** in the top bar returns to this screen from anywhere.
 
-### Dentro de un FGD: dos pestañas
+A device handles around 100 FGDs comfortably. The real limit is the browser's storage
+allowance rather than a fixed number.
 
-1. **Actividades de la finca** — qué actividades se hacen, qué presentación de café se vende y
-   el rendimiento. Determina qué preguntas de costo aparecen después.
-2. **Cuestionario de costos** — solo las categorías que corresponden a lo marcado en la
-   pestaña 1. Cada categoría se puede llenar en modo global o actividad por actividad.
+### Searching the list
 
-### Unidad de área
+A search box sits above the list once there is at least one FGD saved. It matches across the
+FGD name, the cooperative name and the FLO-ID at the same time, so any of the three will find a
+record.
 
-La herramienta nunca convierte entre unidades. Todo se captura en la unidad que se elija, y el
-precio por kg sale de dividir el costo por unidad entre el rendimiento por unidad, así que el
-cálculo es correcto en cualquier unidad mientras las dos cifras estén en la misma.
+It ignores capitals and accents, in both directions: typing "cafe" finds "Sol y Café", and so
+does typing "café". Several words are treated as AND rather than OR, so "bagua 02" narrows to
+the one FGD containing both instead of widening to everything containing either.
 
-Las etiquetas siguen la unidad elegida: si se elige Manzana, el campo de rendimiento pide
-kg/mz y el cuestionario dice mz, no ha. Si se elige **Otra**, aparece un campo para escribir
-el nombre local de la unidad (por ejemplo cuerda o tarea) y las etiquetas lo usan.
+While a search is active the counter reads "Showing 2 of 10 FGDs" and a Clear button appears.
+The search only affects the list. It never changes the comparison tab, and it resets itself
+after an import or a delete so freshly loaded FGDs can never look missing.
 
-### Guardado
+### Comparing FGDs
 
-Todo lo que se escribe queda guardado en el dispositivo automáticamente, dentro del FGD
-abierto. No hace falta apretar nada. Nada sale del dispositivo hasta que se exporta.
+The comparison lives on the home screen rather than inside an FGD, because it describes the
+whole device.
 
-Si el navegador bloquea el guardado (navegación privada, almacenamiento lleno), el indicador
-de arriba a la derecha lo avisa. En ese caso hay que exportar los datos antes de cerrar.
+**Filters.** Three filters sit above the table: coffee type, currency and area unit. The
+average recalculates over whatever remains visible, and its label shows how many FGDs went into
+it, for example "Average (8)".
 
-## Sacar los datos
+**Averages that are left blank.** A kilo of cherry and a kilo of dry parchment are not the same
+thing, so averaging yield or price per kg across different coffee types produces a meaningless
+number. When the visible FGDs do not share a coffee type, those two averages show as a dash and
+a note explains why. The same applies to the money averages (daily wage, total CPS, prices)
+when currencies or area units are mixed. The individual row values stay visible throughout,
+because each one on its own is valid.
 
-Los botones de archivo están en la barra de arriba y se ven desde cualquier pestaña.
+The **price per kg GBE** is the only price column comparable across different coffee types.
+That is what it is for.
 
-- **Guardar este FGD (JSON)** — el FGD abierto, con todo el detalle línea por línea. Sirve
-  para enviarlo por correo a quien consolida, o para pasarlo a otro dispositivo.
-- **Exportar este FGD (CSV)** — el FGD abierto como una sola fila.
-- **Exportar todos (CSV)** — un archivo con una fila por FGD y una columna `fgd_id` que
-  identifica cada uno. Es el archivo pensado para pegar directo en una hoja maestra.
-- **Respaldar todos (JSON)** — respaldo completo de todos los FGD del dispositivo.
-- **Cargar JSON** — acepta tanto un FGD suelto como un respaldo completo. Los FGD se agregan
-  a la lista; no borra nada de lo que ya está en el dispositivo. Si un FGD que se carga tiene
-  el mismo identificador que uno que ya está guardado, se actualiza ese en vez de duplicarse.
-- **Borrar todos los datos** — borra todos los FGD del dispositivo. Pide confirmación.
+### Inside an FGD: two tabs
 
-Los nombres de columna del CSV usan identificadores fijos en inglés (`fertilization_total`,
-`total_cps_per_area_unit`, etc.), no las etiquetas traducidas. Así los archivos de
-facilitadores que trabajan en distinto idioma se alinean en la misma hoja maestra. El CSV de
-un solo FGD y el de todos tienen exactamente las mismas columnas.
+1. **Farm activities**: which activities happen, which coffee type is sold, and the yield. This
+   determines which cost questions appear next.
+2. **Cost questionnaire**: only the categories matching what was ticked on tab 1. Each category
+   can be filled in globally or activity by activity.
 
-Ninguna columna asume hectáreas. Los rendimientos salen como
-`yield_kg_per_area_unit_in_type` y `yield_kg_gbe_per_area_unit`, y la unidad de cada FGD viene
-en `area_unit` (más `area_unit_custom_name` cuando el FGD usa una unidad propia). Al consolidar
-en la hoja maestra hay que revisar esas columnas antes de sumar o promediar entre FGD.
+### Area unit
 
-## Actualizar la app más adelante
+The tool never converts between area units. Everything is captured in whichever unit is chosen,
+and the price per kg comes from dividing cost per unit by yield per unit, so the arithmetic is
+correct in any unit as long as both figures use the same one.
 
-Cuando cambien `index.html`, hay que subir el archivo actualizado **y** cambiar el número de
-versión de `CACHE_NAME` en la primera línea útil de `sw.js` (por ejemplo de
-`"cosp-fgd-shell-v5"` a `"cosp-fgd-shell-v6"`). Sin ese cambio, quien ya instaló la app puede
-seguir viendo la versión vieja guardada en su dispositivo.
+The labels follow the unit chosen. Pick Manzana and the yield field asks for kg/mz and the
+questionnaire says mz rather than ha. Pick **Other** and a field appears for the local name of
+the unit, for example cuerda or tarea, and every label picks it up.
 
-Los datos ya capturados no se pierden al actualizar: quedan en el almacenamiento del
-navegador, aparte de los archivos de la app.
+### Saving
 
-## Límites conocidos
+Everything typed is saved on the device automatically, inside the open FGD. Nothing needs to be
+pressed. Nothing leaves the device until it is exported.
 
-- **Español y portugués son primeras traducciones automáticas.** El inglés es la versión de
-  referencia; conviene que un hablante nativo revise las otras dos antes de usarlas en campo.
-- **Las fuentes de letra (Google Fonts) no se guardan para uso sin conexión.** Si no hay
-  internet la primera vez, el texto se ve con la fuente del sistema. No afecta el
-  funcionamiento, solo la apariencia.
-- **Los datos viven solo en ese dispositivo.** No hay servidor ni sincronización. Si se borran
-  los datos del navegador o se desinstala la app sin exportar, los FGD se pierden. Conviene
-  hacer un respaldo JSON al terminar cada jornada de campo.
-- **Los confirmaciones de borrado son un cuadro dentro de la página**, no el aviso del sistema,
-  porque ese aviso no funciona bien en navegadores iOS distintos de Safari.
+If the browser blocks saving, for instance in private browsing or when storage is full, the
+indicator in the top bar says so. In that case the data must be exported before closing.
+
+## Getting the data out
+
+The file buttons are in the top bar and are visible from every tab.
+
+- **Save this FGD (JSON)** exports the open FGD with all its line by line detail. Use it to
+  email one FGD to whoever is consolidating, or to move it to another device.
+- **Export this FGD (CSV)** exports the open FGD as a single row.
+- **Export all (CSV)** produces one file with one row per FGD and an `fgd_id` column
+  identifying each. This is the file meant for pasting straight into a master sheet.
+- **Back up all (JSON)** is a full backup of every FGD on the device.
+- **Load JSON** accepts either a single FGD or a full backup.
+- **Delete all data** wipes every FGD on the device, after a confirmation.
+
+### A note on loading JSON
+
+Loading adds FGDs to the list. It never deletes anything already on the device.
+
+Loading the same file twice creates a second copy of each FGD rather than updating the
+original, so the list will show duplicates. Delete the extra copies by hand, or delete all data
+first and then load the backup. This is worth knowing when moving data between devices.
+
+### CSV columns
+
+The CSV column names use fixed English identifiers such as `fertilization_total` and
+`total_cps_per_area_unit` rather than the translated labels. Files produced by facilitators
+working in different interface languages therefore line up in the same master sheet. The single
+FGD CSV and the export all CSV have exactly the same columns.
+
+No column assumes hectares. Yields come out as `yield_kg_per_area_unit_in_type` and
+`yield_kg_gbe_per_area_unit`, and each FGD's unit is in `area_unit`, plus
+`area_unit_custom_name` when that FGD uses a unit of its own. Check those columns before
+summing or averaging across FGDs in the master sheet.
+
+## Updating the app later
+
+When `index.html` changes, upload the new file **and** change the version number in
+`CACHE_NAME` at the top of `sw.js`, currently `"cosp-fgd-shell-v7.1"`. Without that change,
+anyone who already installed the app may keep seeing the old version cached on their device.
+
+Data already captured is not lost when the app is updated. It lives in the browser's storage,
+separately from the app files.
+
+## Known limitations
+
+- **Spanish and Portuguese are first machine translations.** English is the reference version.
+  A native speaker should review the other two before they are used in the field.
+- **The fonts (Google Fonts) are not stored for offline use.** With no internet on first load
+  the text falls back to the system font. This affects appearance only, not function.
+- **The data lives only on that device.** There is no server and no synchronisation. If the
+  browser data is cleared or the app is uninstalled without exporting, the FGDs are gone. Take
+  a JSON backup at the end of each day of fieldwork.
+- **Delete confirmations are an in page dialog** rather than the system popup, because the
+  system popup is unreliable in iOS browsers other than Safari.
+- **The Farm Administration category hides its Inputs and Paid labour components**, since they
+  do not apply there. Those two fields stay empty by design. A value forced into them through
+  an imported file would count toward the CPS total without appearing anywhere on screen.
