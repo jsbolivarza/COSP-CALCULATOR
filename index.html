@@ -216,6 +216,12 @@
   .records-empty h2 { color: var(--night); font-family: 'Exo 2', sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
   .records-empty p { color: var(--text-light); font-size: .88rem; margin-bottom: 18px; }
 
+  .search-bar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(30,30,30,.08); padding: 14px 18px; margin-bottom: 14px; }
+  .search-bar .field { flex: 1 1 260px; }
+  .search-bar .field input { min-width: 0; width: 100%; }
+
   .filter-bar { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end;
     background: var(--card); border: 1px solid var(--border); border-radius: 12px;
     box-shadow: 0 1px 3px rgba(30,30,30,.08); padding: 14px 18px; margin-bottom: 14px; }
@@ -249,6 +255,7 @@
     .top-actions .spacer { display: none; }
     .save-status { flex: 1 1 100%; }
     .table-card { padding: 14px; }
+    .search-bar { padding: 12px; gap: 10px; }
     .filter-bar { padding: 12px; gap: 10px; }
     .filter-bar .field { flex: 1 1 140px; }
     .filter-bar select { min-width: 0; width: 100%; }
@@ -322,6 +329,16 @@
 
     <div class="tab-panel" id="listPanelRecords">
       <div class="notice" data-i18n="records_help"></div>
+      <!-- Deliberately outside #recordsListContainer: that container is rebuilt on every
+           keystroke, and an input inside it would be destroyed and lose focus each time. -->
+      <div class="search-bar" id="recordSearchBar">
+        <div class="field">
+          <label for="recordSearch" data-i18n="search_label">Search</label>
+          <input type="search" id="recordSearch" autocomplete="off" data-i18n-ph="search_placeholder"
+            placeholder="FGD name, cooperative or FLO-ID">
+        </div>
+        <button type="button" class="btn btn-outline btn-sm" id="recordSearchClear" data-i18n="search_clear">Clear</button>
+      </div>
       <div id="recordsListContainer"></div>
     </div>
 
@@ -561,6 +578,9 @@ const TRANSLATIONS = {
     col_updated: "Last change", record_open_now: "Open now",
     // ---- compare ----
     tab_list_records: "My FGDs", tab_list_compare: "Compare FGDs",
+    search_label: "Search", search_placeholder: "FGD name, cooperative or FLO-ID", search_clear: "Clear",
+    search_no_match: "No FGD matches that search.", search_clear_link: "Clear the search",
+    records_count_filtered: "Showing {n} of {total} FGDs",
     compare_help: "Every FGD saved on this device, side by side. Use the filters to compare like with like: a price per kg of cherry and a price per kg of parchment are not the same thing. The price per kg GBE is the one figure that is comparable across coffee types.",
     compare_need_more: "Save at least two FGDs to compare them.",
     compare_no_match: "No FGD matches these filters.",
@@ -652,6 +672,9 @@ const TRANSLATIONS = {
     untitled_fgd: "FGD sin nombre", no_coop: "Cooperativa sin anotar",
     col_updated: "Último cambio", record_open_now: "Abierto ahora",
     tab_list_records: "Mis FGD", tab_list_compare: "Comparar FGD",
+    search_label: "Buscar", search_placeholder: "Nombre del FGD, cooperativa o FLO-ID", search_clear: "Limpiar",
+    search_no_match: "Ningún FGD coincide con esa búsqueda.", search_clear_link: "Quitar la búsqueda",
+    records_count_filtered: "Mostrando {n} de {total} FGD",
     compare_help: "Todos los FGD guardados en este dispositivo, uno al lado del otro. Usen los filtros para comparar lo comparable: un precio por kg de cereza y uno por kg de pergamino no son lo mismo. El precio por kg GBE es el único que se puede comparar entre presentaciones distintas.",
     compare_need_more: "Guarden al menos dos FGD para poder compararlos.",
     compare_no_match: "Ningún FGD coincide con estos filtros.",
@@ -742,6 +765,9 @@ const TRANSLATIONS = {
     untitled_fgd: "FGD sem nome", no_coop: "Cooperativa não informada",
     col_updated: "Última alteração", record_open_now: "Aberto agora",
     tab_list_records: "Meus FGD", tab_list_compare: "Comparar FGD",
+    search_label: "Buscar", search_placeholder: "Nome do FGD, cooperativa ou FLO-ID", search_clear: "Limpar",
+    search_no_match: "Nenhum FGD corresponde a essa busca.", search_clear_link: "Limpar a busca",
+    records_count_filtered: "Mostrando {n} de {total} FGD",
     compare_help: "Todos os FGD salvos neste dispositivo, lado a lado. Usem os filtros para comparar o que é comparável: um preço por kg de cereja e um por kg de pergaminho não são a mesma coisa. O preço por kg GBE é o único comparável entre tipos diferentes.",
     compare_need_more: "Salvem pelo menos dois FGD para poder compará-los.",
     compare_no_match: "Nenhum FGD corresponde a estes filtros.",
@@ -886,6 +912,8 @@ let currentId = null;   // id of the record open in the editor
 let state = null;       // the open record itself (kept as `state` so the form code reads the same)
 let screen = "list";    // "list" = overview of FGDs, "editor" = one FGD open
 let compareFilters = { presentation: "", currency: "", areaUnit: "" };
+let recordSearch = "";  // in memory only: a search that survived a restart would hide
+                        // most of the list and look like lost data
 
 function generateRecordId(){
   return "fgd_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 8);
@@ -1228,6 +1256,19 @@ function showConfirm(message, okLabel, onConfirm){
 
 // ==================== SCREEN: LIST OF FGDs ====================
 
+// Accent- and case-insensitive, so a facilitator typing "cafe" on a phone keyboard
+// still finds "Sol y Café". Several words are treated as AND, so "sol cusco" narrows
+// rather than widens.
+function normalizeSearch(v){
+  return String(v === null || v === undefined ? "" : v)
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+function recordMatchesSearch(rec, needle){
+  if(!needle) return true;
+  const haystack = normalizeSearch([rec.fgdName, rec.coopName, rec.floId].join(" "));
+  return needle.split(/\s+/).every(word => haystack.includes(word));
+}
+
 function sortedRecords(){
   return Object.values(records).sort((a,b) =>
     (b.meta.updatedAt || "").localeCompare(a.meta.updatedAt || ""));
@@ -1235,8 +1276,16 @@ function sortedRecords(){
 
 function renderRecordsList(){
   const container = document.getElementById("recordsListContainer");
-  const list = sortedRecords();
-  if(!list.length){
+  const all = sortedRecords();
+  const needle = normalizeSearch(recordSearch);
+  const list = all.filter(rec => recordMatchesSearch(rec, needle));
+
+  // No point offering a search box on an empty device, or a Clear button with
+  // nothing to clear.
+  document.getElementById("recordSearchBar").style.display = all.length ? "" : "none";
+  document.getElementById("recordSearchClear").style.display = recordSearch ? "" : "none";
+
+  if(!all.length){
     container.innerHTML = `
       <div class="empty-state records-empty">
         <h2>${esc(t("records_empty_title"))}</h2>
@@ -1245,6 +1294,16 @@ function renderRecordsList(){
       </div>`;
     const btn = container.querySelector("[data-new-record]");
     if(btn) btn.addEventListener("click", createNewRecord);
+    return;
+  }
+
+  if(!list.length){
+    container.innerHTML = `
+      <div class="empty-state">${esc(t("search_no_match"))}
+        <a data-clear-search>${esc(t("search_clear_link"))}</a>
+      </div>`;
+    const link = container.querySelector("[data-clear-search]");
+    if(link) link.addEventListener("click", clearRecordSearch);
     return;
   }
   const cards = list.map(rec => {
@@ -1267,8 +1326,11 @@ function renderRecordsList(){
         </div>
       </div>`;
   }).join("");
+  const countText = needle
+    ? t("records_count_filtered").replace("{n}", list.length).replace("{total}", all.length)
+    : list.length + " " + t("records_count_suffix");
   container.innerHTML = `
-    <p class="records-count">${list.length} ${esc(t("records_count_suffix"))}</p>
+    <p class="records-count">${esc(countText)}</p>
     <div class="records-list">${cards}</div>`;
 
   container.querySelectorAll("[data-open-record]").forEach(b =>
@@ -1287,6 +1349,14 @@ function applyScreen(){
   document.querySelectorAll(".editor-only").forEach(el => {
     el.style.display = screen === "editor" ? "" : "none";
   });
+}
+
+function clearRecordSearch(){
+  recordSearch = "";
+  const box = document.getElementById("recordSearch");
+  box.value = "";
+  renderRecordsList();
+  box.focus();
 }
 
 function goToRecordsList(){
@@ -1362,6 +1432,8 @@ function deleteAllRecords(){
     persistAllRecords(records);
     screen = "list";
     compareFilters = { presentation: "", currency: "", areaUnit: "" };
+    recordSearch = "";
+    document.getElementById("recordSearch").value = "";
     goToRecordsList();
   });
 }
@@ -2035,6 +2107,9 @@ function applyStaticTranslations(){
       el.textContent = value;
     }
   });
+  document.querySelectorAll("[data-i18n-ph]").forEach(el => {
+    el.setAttribute("placeholder", t(el.getAttribute("data-i18n-ph")));
+  });
   document.title = t("app_title") + " — " + t("app_subtitle");
 }
 
@@ -2107,6 +2182,12 @@ document.getElementById("presentationSelect").addEventListener("change", (e) => 
 document.querySelectorAll("#langToggle button").forEach(btn => {
   btn.addEventListener("click", () => setLanguage(btn.getAttribute("data-lang")));
 });
+
+document.getElementById("recordSearch").addEventListener("input", (e) => {
+  recordSearch = e.target.value;
+  renderRecordsList();
+});
+document.getElementById("recordSearchClear").addEventListener("click", clearRecordSearch);
 
 document.getElementById("listTabRecords").addEventListener("click", () => switchListTab("records"));
 document.getElementById("listTabCompare").addEventListener("click", () => switchListTab("compare"));
@@ -2259,6 +2340,8 @@ document.getElementById("importFileInput").addEventListener("change", (e) => {
         lastId = rec.meta.id;
       });
       persistAllRecords(records);
+      recordSearch = "";
+      document.getElementById("recordSearch").value = "";
       if(usable.length === 1 && lastId) openRecord(lastId);
       else goToRecordsList();
     });
